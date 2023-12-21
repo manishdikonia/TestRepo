@@ -8,8 +8,7 @@
     "npm": ">=7.6.3"
   },
   "scripts": {
-    "start": "pm2-runtime start ecosystem.config.js",
-    "test": "node_modules/.bin/mocha -w --timeout 10000"
+    "start": "node server.js"
   },
   "dependencies": {
     "aws-sdk": "^2.1107.0",
