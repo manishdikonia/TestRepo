@@ -27,6 +27,6 @@ jobs:
     - run: npm ci
     - run : |
        touch .env
-       echo "{{secrets.TEST_ENV_FILE}}" > .env
+       echo "${{secrets.TEST_ENV_FILE}}" > .env
     - run: pm2 restart server
     
