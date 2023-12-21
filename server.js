@@ -47,7 +47,7 @@ app.get("/", (req, res) => {
 		docs: `${process.env.BASE_URL}api-docs`,
 	})
 })
-//test------------
+//test
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // import all routes at once
