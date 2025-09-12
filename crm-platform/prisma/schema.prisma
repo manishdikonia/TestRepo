@@ -1,0 +1,578 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================
+// Enums
+// ==========================
+
+enum UserRole {
+  ADMIN
+  STAFF
+  PARTNER
+}
+
+enum ActivityType {
+  REMINDER
+  TODO
+  MEETING
+  CALL
+  EMAIL
+  WHATSAPP
+  NOTE
+}
+
+enum SocialPlatform {
+  FACEBOOK
+  LINKEDIN
+  INSTAGRAM
+  TWITTER
+  OTHER
+}
+
+enum FieldType {
+  TEXT
+  NUMBER
+  DATE
+  BOOLEAN
+  SELECT
+  MULTI_SELECT
+}
+
+enum LeadStage {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  WON
+  LOST
+}
+
+enum Channel {
+  EMAIL
+  WHATSAPP
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum QuestionType {
+  MCQ
+  SUBJECTIVE
+  RATING
+  SINGLE_SELECT
+}
+
+// ==========================
+// Core Auth / Users / Partners
+// ==========================
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole
+
+  partners                Partner[]
+  auditLogs               AuditLog[]
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  ContactNote             ContactNote[]
+  Document                Document[]
+  ContactActivity         ContactActivity[]
+  MergeLog                MergeLog[]
+  CRMTracker              CRMTracker[]
+  Lead                    Lead[]
+  Assessment              Assessment[]
+  Questionnaire           Questionnaire[]
+  QuestionnaireAssignment QuestionnaireAssignment[]
+  MessageTemplate         MessageTemplate[]
+  Campaign                Campaign[]
+}
+
+model Partner {
+  id           String  @id @default(cuid())
+  userId       String  @unique
+  user         User    @relation(fields: [userId], references: [id])
+  name         String?
+  organization String?
+
+  trackers  CRMTrackerPartner[]
+  leads     LeadPartnerAssignment[]
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+}
+
+// ==========================
+// CMS: Contacts, Categories, Notes, Activities, Social, Traits
+// ==========================
+
+model Contact {
+  id          String  @id @default(cuid())
+  name        String
+  phone       String?
+  email       String?
+  location    String?
+  personType  String? // Entrepreneur / Employee
+  company     String?
+  designation String?
+  industry    String?
+  website     String?
+
+  categories  ContactCategoryAssignment[]
+  notes       ContactNote[]
+  documents   Document[]
+  activities  ContactActivity[]
+  socialLinks SocialLink[]
+  traitScores ContactTraitScore[]
+  leads       Lead[]
+  submissions AssessmentSubmission[]
+  qResponses  QuestionnaireResponse[]
+
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  MergeLog                MergeLog[]
+  QuestionnaireAssignment QuestionnaireAssignment[]
+  CampaignRecipient       CampaignRecipient[]
+
+  @@index([name, phone])
+}
+
+model Category {
+  id          String                      @id @default(cuid())
+  name        String                      @unique
+  description String?
+  contacts    ContactCategoryAssignment[]
+}
+
+model ContactCategoryAssignment {
+  id         String   @id @default(cuid())
+  contactId  String
+  categoryId String
+  contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, categoryId])
+}
+
+model ContactNote {
+  id        String   @id @default(cuid())
+  contactId String
+  authorId  String?
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  author    User?    @relation(fields: [authorId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Document {
+  id           String   @id @default(cuid())
+  contactId    String?
+  uploadedById String?
+  contact      Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id])
+  fileName     String
+  mimeType     String?
+  url          String
+  sizeBytes    Int?
+  createdAt    DateTime @default(now())
+}
+
+model ContactActivity {
+  id          String       @id @default(cuid())
+  contactId   String
+  leadId      String?
+  createdById String?
+  contact     Contact      @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  lead        Lead?        @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  createdBy   User?        @relation(fields: [createdById], references: [id])
+  type        ActivityType
+  title       String
+  description String?
+  dueAt       DateTime?
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model SocialLink {
+  id        String         @id @default(cuid())
+  contactId String
+  contact   Contact        @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  platform  SocialPlatform
+  url       String
+}
+
+model ContactTraitScore {
+  id                 String  @id @default(cuid())
+  contactId          String
+  contact            Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  traitName          String
+  score              Int?
+  maxScore           Int?
+  rank               String?
+  sourceAssessmentId String?
+  sourceSubmissionId String?
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  entityType String
+  entityId   String
+  action     String
+  changes    Json?
+  createdAt  DateTime @default(now())
+}
+
+model MergeLog {
+  id               String   @id @default(cuid())
+  targetContactId  String
+  targetContact    Contact  @relation(fields: [targetContactId], references: [id])
+  sourceContactIds Json
+  mergedById       String?
+  mergedBy         User?    @relation(fields: [mergedById], references: [id])
+  mergedAt         DateTime @default(now())
+}
+
+// ==========================
+// CRM: Trackers, Leads, Fields, Partner Access
+// ==========================
+
+model CRMTracker {
+  id          String  @id @default(cuid())
+  name        String
+  productName String?
+  description String?
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
+  fields   CRMFieldDefinition[]
+  leads    Lead[]
+  partners CRMTrackerPartner[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CRMFieldDefinition {
+  id         String     @id @default(cuid())
+  trackerId  String
+  tracker    CRMTracker @relation(fields: [trackerId], references: [id], onDelete: Cascade)
+  key        String
+  label      String
+  type       FieldType
+  isRequired Boolean    @default(false)
+  options    Json?
+  order      Int        @default(0)
+  isActive   Boolean    @default(true)
+
+  values LeadFieldValue[]
+
+  @@unique([trackerId, key])
+}
+
+model Lead {
+  id             String     @id @default(cuid())
+  trackerId      String
+  tracker        CRMTracker @relation(fields: [trackerId], references: [id], onDelete: Cascade)
+  contactId      String?
+  contact        Contact?   @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  title          String?
+  stage          LeadStage  @default(NEW)
+  statusNotes    String?
+  ownerUserId    String?
+  ownerUser      User?      @relation(fields: [ownerUserId], references: [id])
+  lastFollowUpAt DateTime?
+
+  fieldValues      LeadFieldValue[]
+  activities       ContactActivity[]
+  partnerAssignees LeadPartnerAssignment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([trackerId, stage])
+}
+
+model LeadFieldValue {
+  id      String             @id @default(cuid())
+  leadId  String
+  fieldId String
+  lead    Lead               @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  field   CRMFieldDefinition @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  valueString  String?
+  valueNumber  Float?
+  valueDate    DateTime?
+  valueBoolean Boolean?
+  valueJson    Json?
+
+  @@unique([leadId, fieldId])
+}
+
+model CRMTrackerPartner {
+  id        String     @id @default(cuid())
+  trackerId String
+  partnerId String
+  tracker   CRMTracker @relation(fields: [trackerId], references: [id], onDelete: Cascade)
+  partner   Partner    @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  canEdit   Boolean    @default(true)
+
+  @@unique([trackerId, partnerId])
+}
+
+model LeadPartnerAssignment {
+  id         String   @id @default(cuid())
+  leadId     String
+  partnerId  String
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  partner    Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  canEdit    Boolean  @default(true)
+  assignedAt DateTime @default(now())
+
+  @@unique([leadId, partnerId])
+}
+
+// ==========================
+// Assessments (Lead Generation)
+// ==========================
+
+model Assessment {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  isPublic    Boolean @default(true)
+  publicSlug  String  @unique
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
+  questions   AssessmentQuestion[]
+  submissions AssessmentSubmission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AssessmentQuestion {
+  id           String       @id @default(cuid())
+  assessmentId String
+  assessment   Assessment   @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  text         String
+  type         QuestionType
+  required     Boolean      @default(true)
+  order        Int          @default(0)
+
+  options          AssessmentQuestionOption[]
+  AssessmentAnswer AssessmentAnswer[]
+}
+
+model AssessmentQuestionOption {
+  id               String             @id @default(cuid())
+  questionId       String
+  question         AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text             String
+  value            String?
+  score            Int?               @default(0)
+  isCorrect        Boolean?           @default(false)
+  order            Int?               @default(0)
+  AssessmentAnswer AssessmentAnswer[]
+}
+
+model AssessmentSubmission {
+  id           String     @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  contactId    String?
+  contact      Contact?   @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  respondentName  String?
+  respondentEmail String?
+  respondentPhone String?
+
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+
+  answers AssessmentAnswer[]
+
+  totalScore            Int?
+  resultTraitName       String?
+  resultPersonalityType String?
+  resultJson            Json?
+}
+
+model AssessmentAnswer {
+  id           String                    @id @default(cuid())
+  submissionId String
+  submission   AssessmentSubmission      @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  questionId   String
+  question     AssessmentQuestion        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  optionId     String?
+  option       AssessmentQuestionOption? @relation(fields: [optionId], references: [id])
+
+  textValue    String?
+  numericValue Float?
+  score        Int?
+}
+
+// ==========================
+// Research Questionnaires (ICPs)
+// ==========================
+
+model Questionnaire {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
+  questions   QuestionnaireQuestion[]
+  assignments QuestionnaireAssignment[]
+  responses   QuestionnaireResponse[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QuestionnaireQuestion {
+  id              String        @id @default(cuid())
+  questionnaireId String
+  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  text            String
+  type            QuestionType
+  required        Boolean       @default(true)
+  order           Int           @default(0)
+
+  options             QuestionnaireQuestionOption[]
+  QuestionnaireAnswer QuestionnaireAnswer[]
+}
+
+model QuestionnaireQuestionOption {
+  id                  String                @id @default(cuid())
+  questionId          String
+  question            QuestionnaireQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text                String
+  value               String?
+  order               Int?                  @default(0)
+  QuestionnaireAnswer QuestionnaireAnswer[]
+}
+
+model QuestionnaireAssignment {
+  id              String        @id @default(cuid())
+  questionnaireId String
+  contactId       String
+  assignedById    String?
+  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  contact         Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  assignedBy      User?         @relation(fields: [assignedById], references: [id])
+  assignedAt      DateTime      @default(now())
+
+  @@unique([questionnaireId, contactId])
+}
+
+model QuestionnaireResponse {
+  id              String        @id @default(cuid())
+  questionnaireId String
+  contactId       String
+  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  contact         Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  submittedAt     DateTime      @default(now())
+
+  answers QuestionnaireAnswer[]
+}
+
+model QuestionnaireAnswer {
+  id           String                       @id @default(cuid())
+  responseId   String
+  questionId   String
+  optionId     String?
+  response     QuestionnaireResponse        @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question     QuestionnaireQuestion        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  option       QuestionnaireQuestionOption? @relation(fields: [optionId], references: [id])
+  textValue    String?
+  numericValue Float?
+}
+
+// ==========================
+// Marketing: Templates, Campaigns, Recipients
+// ==========================
+
+model MessageTemplate {
+  id          String   @id @default(cuid())
+  channel     Channel
+  name        String
+  subject     String?
+  body        String
+  variables   Json?
+  isActive    Boolean  @default(true)
+  createdById String?
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  campaigns Campaign[]
+}
+
+model Campaign {
+  id          String          @id @default(cuid())
+  channel     Channel
+  name        String
+  templateId  String
+  template    MessageTemplate @relation(fields: [templateId], references: [id])
+  filterJson  Json?
+  status      CampaignStatus  @default(DRAFT)
+  scheduledAt DateTime?
+  createdById String?
+  createdBy   User?           @relation(fields: [createdById], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  recipients CampaignRecipient[]
+}
+
+model CampaignRecipient {
+  id            String    @id @default(cuid())
+  campaignId    String
+  contactId     String
+  campaign      Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact       Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  toAddress     String?
+  toPhone       String?
+  status        String? // queued, sent, delivered, failed, read
+  providerMsgId String?
+  error         String?
+  sentAt        DateTime?
+  deliveredAt   DateTime?
+  readAt        DateTime?
+
+  @@index([campaignId, contactId])
+}
+
+model IntegrationAccount {
+  id          String   @id @default(cuid())
+  channel     Channel
+  provider    String
+  credentials Json
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
