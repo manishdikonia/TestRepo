@@ -1,0 +1,35 @@
+// Core entities
+export { User } from './user.entity';
+export { Contact } from './contact.entity';
+export { Category } from './category.entity';
+export { ContactNote } from './contact-note.entity';
+export { ContactActivity } from './contact-activity.entity';
+export { SocialMediaProfile } from './social-media-profile.entity';
+
+// CRM entities
+export { CrmTracker } from './crm-tracker.entity';
+export { CrmField } from './crm-field.entity';
+export { CrmLead } from './crm-lead.entity';
+export { CrmLeadUpdate } from './crm-lead-update.entity';
+
+// Assessment entities
+export { Assessment } from './assessment.entity';
+export { AssessmentQuestion } from './assessment-question.entity';
+export { AssessmentQuestionOption } from './assessment-question-option.entity';
+export { AssessmentResponse } from './assessment-response.entity';
+export { AssessmentAnswer } from './assessment-answer.entity';
+
+// Questionnaire entities
+export { Questionnaire } from './questionnaire.entity';
+export { QuestionnaireQuestion } from './questionnaire-question.entity';
+export { QuestionnaireQuestionOption } from './questionnaire-question-option.entity';
+export { QuestionnaireResponse } from './questionnaire-response.entity';
+export { QuestionnaireAnswer } from './questionnaire-answer.entity';
+
+// Marketing entities
+export { Campaign } from './campaign.entity';
+export { EmailTemplate } from './email-template.entity';
+export { CampaignMessage } from './campaign-message.entity';
+
+// Audit entity
+export { AuditLog } from './audit-log.entity';
