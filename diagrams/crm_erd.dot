@@ -1,0 +1,100 @@
+digraph CRM_ERD {
+  graph [rankdir=LR, fontsize=10, fontname="Inter", label="CRM Platform - ER Diagram", labelloc=t];
+  node [shape=record, fontname="Inter", fontsize=9];
+  edge [fontname="Inter", fontsize=8];
+
+  subgraph cluster_user_mgmt {
+    label="USER MANAGEMENT";
+    color="#6c8ebf";
+    USERS [label="{USERS|id (PK)\lemail (UK)\lpassword\lfirstName\llastName\lphone\lrole\lisActive\lcompany\ldesignation\lcreatedAt\lupdatedAt\ldeletedAt\l}"];
+  }
+
+  subgraph cluster_contact {
+    label="CONTACT MANAGEMENT";
+    color="#82b366";
+    CONTACT_CATEGORIES [label="{CONTACT_CATEGORIES|id (PK)\lname (UK)\ldescription\lisActive\lcreatedAt\lupdatedAt\l}"];
+    CONTACTS [label="{CONTACTS|id (PK)\lname\lcontactNo\lemailId\llocation\ltype\lcompany\ldesignation\lindustry\lwebsite\linnerDrives\lbaselines\ltraits\lpersonalityType\lcategoryId (FK)\lcreatedById (FK)\lcreatedAt\lupdatedAt\l}"];
+    CONTACT_NOTES [label="{CONTACT_NOTES|id (PK)\lcontent\lattachmentUrl\lattachmentName\lcontactId (FK)\lcreatedById (FK)\lcreatedAt\lupdatedAt\l}"];
+    CONTACT_ACTIVITIES [label="{CONTACT_ACTIVITIES|id (PK)\ltype\ltitle\ldescription\lscheduledAt\lisCompleted\lcontactId (FK)\lcreatedById (FK)\lcreatedAt\lupdatedAt\l}"];
+    CONTACT_SOCIAL_LINKS [label="{CONTACT_SOCIAL_LINKS|id (PK)\lplatform\lurl\lusername\lcontactId (FK)\lcreatedAt\lupdatedAt\l}"];
+  }
+
+  subgraph cluster_leads {
+    label="LEAD MANAGEMENT";
+    color="#e58c72";
+    CRM_TRACKERS [label="{CRM_TRACKERS|id (PK)\lname\ldescription\lisActive\lcreatedById (FK)\lcreatedAt\lupdatedAt\l}"];
+    LEADS [label="{LEADS|id (PK)\ltitle\ldescription\lstatus\lestimatedValue\lexpectedCloseDate\lcontactId (FK)\ltrackerId (FK)\lassignedToId (FK)\lcreatedById (FK)\lcreatedAt\lupdatedAt\l}"];
+    CRM_FIELDS [label="{CRM_FIELDS|id (PK)\lname\llabel\ltype\lisRequired\loptions\lplaceholder\lhelpText\lsortOrder\ltrackerId (FK)\lcreatedAt\lupdatedAt\l}"];
+    LEAD_FIELD_VALUES [label="{LEAD_FIELD_VALUES|id (PK)\lvalue\lleadId (FK)\lfieldId (FK)\lcreatedAt\lupdatedAt\l}"];
+  }
+
+  subgraph cluster_assessments {
+    label="ASSESSMENT SYSTEM";
+    color="#c792ea";
+    ASSESSMENTS [label="{ASSESSMENTS|id (PK)\ltitle\ldescription\ltrait\lisActive\lisPublic\lpublicUrl\lscoringLogic\lcreatedById (FK)\lcreatedAt\lupdatedAt\l}"];
+    ASSESSMENT_QUESTIONS [label="{ASSESSMENT_QUESTIONS|id (PK)\lquestion\ltype\lpoints\lsortOrder\lassessmentId (FK)\lcreatedAt\lupdatedAt\l}"];
+    ASSESSMENT_QUESTION_OPTIONS [label="{ASSESSMENT_QUESTION_OPTIONS|id (PK)\ltext\lpoints\lisCorrect\lsortOrder\lquestionId (FK)\lcreatedAt\lupdatedAt\l}"];
+    ASSESSMENT_RESPONSES [label="{ASSESSMENT_RESPONSES|id (PK)\ltotalScore\lmaxScore\lpercentage\lpersonalityType\ltraits\lranking\lassessmentId (FK)\lcontactId (FK)\lcreatedAt\lupdatedAt\l}"];
+    ASSESSMENT_RESPONSE_ANSWERS [label="{ASSESSMENT_RESPONSE_ANSWERS|id (PK)\lanswerText\lpoints\lresponseId (FK)\lquestionId (FK)\loptionId (FK)\lcreatedAt\lupdatedAt\l}"];
+  }
+
+  subgraph cluster_questionnaires {
+    label="QUESTIONNAIRE SYSTEM";
+    color="#f6b26b";
+    QUESTIONNAIRES [label="{QUESTIONNAIRES|id (PK)\ltitle\ldescription\lisActive\lcreatedById (FK)\lcreatedAt\lupdatedAt\l}"];
+    QUESTIONNAIRE_QUESTIONS [label="{QUESTIONNAIRE_QUESTIONS|id (PK)\lquestion\ltype\lisRequired\lsortOrder\lhelpText\lquestionnaireId (FK)\lcreatedAt\lupdatedAt\l}"];
+    QUESTIONNAIRE_QUESTION_OPTIONS [label="{QUESTIONNAIRE_QUESTION_OPTIONS|id (PK)\ltext\lsortOrder\lquestionId (FK)\lcreatedAt\lupdatedAt\l}"];
+    QUESTIONNAIRE_RESPONSES [label="{QUESTIONNAIRE_RESPONSES|id (PK)\lquestionnaireId (FK)\lcontactId (FK)\lcreatedAt\lupdatedAt\l}"];
+    QUESTIONNAIRE_RESPONSE_ANSWERS [label="{QUESTIONNAIRE_RESPONSE_ANSWERS|id (PK)\lanswerText\lresponseId (FK)\lquestionId (FK)\loptionId (FK)\lcreatedAt\lupdatedAt\l}"];
+  }
+
+  subgraph cluster_marketing {
+    label="MARKETING SYSTEM";
+    color="#a4c2f4";
+    MARKETING_CAMPAIGNS [label="{MARKETING_CAMPAIGNS|id (PK)\lname\ldescription\ltype\lstatus\lsubject\lcontent\lscheduledAt\lsentAt\ltotalRecipients\lsentCount\ldeliveredCount\lopenedCount\lclickedCount\lcreatedById (FK)\lcategoryId (FK)\lcreatedAt\lupdatedAt\l}"];
+    MARKETING_MESSAGES [label="{MARKETING_MESSAGES|id (PK)\lstatus\lsentAt\ldeliveredAt\lopenedAt\lclickedAt\lerrorMessage\lcampaignId (FK)\lcontactId (FK)\lcreatedAt\lupdatedAt\l}"];
+  }
+
+  // Relationships
+  USERS -> CONTACTS [label="1:N createdById", color="#666666"];
+  USERS -> LEADS [label="1:N createdById/assignedToId", color="#666666"];
+  USERS -> ASSESSMENTS [label="1:N createdById", color="#666666"];
+  USERS -> QUESTIONNAIRES [label="1:N createdById", color="#666666"];
+  USERS -> CRM_TRACKERS [label="1:N createdById", color="#666666"];
+  USERS -> MARKETING_CAMPAIGNS [label="1:N createdById", color="#666666"];
+
+  CONTACT_CATEGORIES -> CONTACTS [label="1:N categoryId", color="#666666"];
+  CONTACT_CATEGORIES -> MARKETING_CAMPAIGNS [label="1:N categoryId", color="#666666"];
+
+  CONTACTS -> CONTACT_NOTES [label="1:N contactId", color="#666666"];
+  CONTACTS -> CONTACT_ACTIVITIES [label="1:N contactId", color="#666666"];
+  CONTACTS -> CONTACT_SOCIAL_LINKS [label="1:N contactId", color="#666666"];
+  CONTACTS -> LEADS [label="1:N contactId", color="#666666"];
+  CONTACTS -> ASSESSMENT_RESPONSES [label="1:N contactId", color="#666666"];
+  CONTACTS -> QUESTIONNAIRE_RESPONSES [label="1:N contactId", color="#666666"];
+  CONTACTS -> MARKETING_MESSAGES [label="1:N contactId", color="#666666"];
+
+  CRM_TRACKERS -> CRM_FIELDS [label="1:N trackerId", color="#666666"];
+  CRM_TRACKERS -> LEADS [label="1:N trackerId", color="#666666"];
+
+  CRM_FIELDS -> LEAD_FIELD_VALUES [label="1:N fieldId", color="#666666"];
+  LEADS -> LEAD_FIELD_VALUES [label="1:N leadId", color="#666666"];
+
+  ASSESSMENTS -> ASSESSMENT_QUESTIONS [label="1:N assessmentId", color="#666666"];
+  ASSESSMENTS -> ASSESSMENT_RESPONSES [label="1:N assessmentId", color="#666666"];
+
+  ASSESSMENT_QUESTIONS -> ASSESSMENT_QUESTION_OPTIONS [label="1:N questionId", color="#666666"];
+  ASSESSMENT_QUESTIONS -> ASSESSMENT_RESPONSE_ANSWERS [label="1:N questionId", color="#666666"];
+
+  ASSESSMENT_RESPONSES -> ASSESSMENT_RESPONSE_ANSWERS [label="1:N responseId", color="#666666"];
+
+  QUESTIONNAIRES -> QUESTIONNAIRE_QUESTIONS [label="1:N questionnaireId", color="#666666"];
+  QUESTIONNAIRES -> QUESTIONNAIRE_RESPONSES [label="1:N questionnaireId", color="#666666"];
+
+  QUESTIONNAIRE_QUESTIONS -> QUESTIONNAIRE_QUESTION_OPTIONS [label="1:N questionId", color="#666666"];
+  QUESTIONNAIRE_QUESTIONS -> QUESTIONNAIRE_RESPONSE_ANSWERS [label="1:N questionId", color="#666666"];
+
+  QUESTIONNAIRE_RESPONSES -> QUESTIONNAIRE_RESPONSE_ANSWERS [label="1:N responseId", color="#666666"];
+
+  MARKETING_CAMPAIGNS -> MARKETING_MESSAGES [label="1:N campaignId", color="#666666"];
+}
