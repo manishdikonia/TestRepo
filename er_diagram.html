@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training & Assessment Management Platform - ER Diagram</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #2C3E50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        .legend {
+            margin-top: 20px;
+            padding: 15px;
+            background: #E8F4F8;
+            border-radius: 5px;
+        }
+        .legend h3 {
+            margin-top: 0;
+            color: #2C3E50;
+        }
+        .legend ul {
+            list-style: none;
+            padding: 0;
+        }
+        .legend li {
+            margin: 5px 0;
+        }
+        .table-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .table-section h3 {
+            margin-top: 0;
+            color: #2C3E50;
+        }
+        .attributes {
+            font-family: monospace;
+            font-size: 14px;
+            color: #555;
+        }
+        .pk { color: #e74c3c; font-weight: bold; }
+        .fk { color: #3498db; font-style: italic; }
+        #mermaid-diagram {
+            min-height: 800px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Training & Assessment Management Platform - Entity Relationship Diagram</h1>
+    
+    <div class="diagram-container">
+        <div id="mermaid-diagram" class="mermaid">
+erDiagram
+    %% User Management
+    USERS {
+        int user_id PK
+        varchar email UK
+        varchar password_hash
+        varchar first_name
+        varchar last_name
+        enum role_type
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    PARTICIPANTS {
+        int participant_id PK
+        int user_id FK
+        int company_id FK
+        int batch_id FK
+        varchar designation
+        varchar department
+        varchar employee_id
+        enum profile_type
+        timestamp created_at
+    }
+    
+    COACHES {
+        int coach_id PK
+        int user_id FK
+        varchar specialization
+        text certification
+        int experience_years
+        text bio
+        boolean is_available
+    }
+    
+    COMPANIES {
+        int company_id PK
+        varchar company_name
+        varchar industry
+        varchar hr_contact_email
+        varchar hr_contact_phone
+        text address
+        json contract_details
+        int max_employees
+        boolean is_active
+        timestamp created_at
+    }
+    
+    ADMINS {
+        int admin_id PK
+        int user_id FK
+        enum admin_level
+        json permissions
+    }
+    
+    %% Batch Management
+    BATCHES {
+        int batch_id PK
+        int company_id FK
+        int coach_id FK
+        varchar batch_name
+        varchar batch_code
+        int max_size
+        int current_size
+        date start_date
+        date end_date
+        enum status
+    }
+    
+    BATCH_PARTICIPANTS {
+        int batch_participant_id PK
+        int batch_id FK
+        int participant_id FK
+        date enrolled_date
+        enum completion_status
+        decimal progress_percentage
+    }
+    
+    %% Assessment Management
+    ASSESSMENT_TOOLS {
+        int tool_id PK
+        varchar tool_name
+        varchar tool_code
+        text description
+        int question_count
+        int duration_minutes
+        json scoring_algorithm
+        boolean is_active
+        varchar version
+    }
+    
+    ASSESSMENTS {
+        int assessment_id PK
+        int participant_id FK
+        int tool_id FK
+        int batch_id FK
+        enum assessment_type
+        enum status
+        timestamp started_at
+        timestamp completed_at
+        int validity_period
+        int attempt_number
+    }
+    
+    ASSESSMENT_RESULTS {
+        int result_id PK
+        int assessment_id FK
+        json raw_score
+        json calculated_result
+        json final_result
+        boolean is_frozen
+        date freeze_date
+        int last_edited_by FK
+        text edit_reason
+    }
+    
+    QUESTIONS {
+        int question_id PK
+        int tool_id FK
+        text question_text
+        enum question_type
+        json options_json
+        text correct_answer
+        decimal weight
+        int sequence_order
+        boolean is_mandatory
+    }
+    
+    PARTICIPANT_ANSWERS {
+        int answer_id PK
+        int assessment_id FK
+        int question_id FK
+        text answer_value
+        text answer_text
+        int time_spent_seconds
+        timestamp submitted_at
+    }
+    
+    %% Assignments and Resources
+    ASSIGNMENTS {
+        int assignment_id PK
+        int tool_id FK
+        varchar title
+        text description
+        text instructions
+        int due_days
+        decimal max_score
+        boolean is_mandatory
+    }
+    
+    ASSIGNMENT_SUBMISSIONS {
+        int submission_id PK
+        int assignment_id FK
+        int participant_id FK
+        int assessment_id FK
+        text submission_text
+        varchar file_path
+        timestamp submitted_at
+        decimal score
+        text feedback
+    }
+    
+    RESOURCES {
+        int resource_id PK
+        int tool_id FK
+        varchar resource_name
+        enum resource_type
+        varchar file_path
+        varchar url
+        enum access_level
+        boolean is_downloadable
+        int sequence_order
+    }
+    
+    BATCH_RESOURCES {
+        int batch_resource_id PK
+        int batch_id FK
+        int resource_id FK
+        int coach_id FK
+        timestamp unlocked_at
+        timestamp locked_at
+        enum access_type
+    }
+    
+    %% Interview Management
+    INTERVIEW_CANDIDATES {
+        int candidate_id PK
+        int company_id FK
+        varchar email
+        varchar full_name
+        varchar phone
+        varchar position_applied
+        varchar assessment_link
+        timestamp link_expiry
+        enum status
+        int converted_to_participant FK
+    }
+    
+    ASSESSMENT_PACKAGES {
+        int package_id PK
+        int company_id FK
+        varchar package_name
+        json tool_quotas_json
+        date purchased_date
+        date expiry_date
+        int total_assessments
+        int used_assessments
+    }
+    
+    %% Quiz Management
+    QUIZZES {
+        int quiz_id PK
+        int coach_id FK
+        varchar quiz_name
+        varchar quiz_code
+        json questions_json
+        int duration_minutes
+        boolean is_live
+    }
+    
+    QUIZ_SESSIONS {
+        int session_id PK
+        int quiz_id FK
+        int batch_id FK
+        varchar access_code
+        text qr_code
+        timestamp started_at
+        timestamp ended_at
+    }
+    
+    QUIZ_RESPONSES {
+        int response_id PK
+        int session_id FK
+        varchar participant_name
+        varchar participant_email
+        json responses_json
+        decimal score
+        timestamp submitted_at
+    }
+    
+    %% Supporting Tables
+    COACH_COMPANIES {
+        int coach_company_id PK
+        int coach_id FK
+        int company_id FK
+        date assigned_date
+        boolean is_active
+    }
+    
+    SYSTEM_SETTINGS {
+        int setting_id PK
+        varchar setting_key
+        text setting_value
+        varchar setting_type
+        text description
+        int updated_by FK
+        timestamp updated_at
+    }
+    
+    CRM_SYNC_LOG {
+        int sync_id PK
+        int participant_id FK
+        enum sync_type
+        json sync_data_json
+        enum sync_status
+        text error_message
+        timestamp synced_at
+    }
+    
+    %% Relationships
+    USERS ||--o| PARTICIPANTS : "has profile"
+    USERS ||--o| COACHES : "has profile"
+    USERS ||--o| ADMINS : "has profile"
+    
+    COMPANIES ||--o{ PARTICIPANTS : "employs"
+    COMPANIES ||--o{ BATCHES : "creates"
+    COMPANIES ||--o{ INTERVIEW_CANDIDATES : "interviews"
+    COMPANIES ||--o{ ASSESSMENT_PACKAGES : "purchases"
+    
+    BATCHES ||--o{ BATCH_PARTICIPANTS : "contains"
+    PARTICIPANTS ||--o{ BATCH_PARTICIPANTS : "enrolled in"
+    COACHES ||--o{ BATCHES : "manages"
+    
+    ASSESSMENT_TOOLS ||--o{ ASSESSMENTS : "used in"
+    ASSESSMENT_TOOLS ||--o{ QUESTIONS : "contains"
+    ASSESSMENT_TOOLS ||--o{ ASSIGNMENTS : "linked to"
+    ASSESSMENT_TOOLS ||--o{ RESOURCES : "has"
+    
+    PARTICIPANTS ||--o{ ASSESSMENTS : "takes"
+    BATCHES ||--o{ ASSESSMENTS : "includes"
+    ASSESSMENTS ||--|| ASSESSMENT_RESULTS : "generates"
+    ASSESSMENTS ||--o{ PARTICIPANT_ANSWERS : "contains"
+    QUESTIONS ||--o{ PARTICIPANT_ANSWERS : "answered by"
+    
+    ASSIGNMENTS ||--o{ ASSIGNMENT_SUBMISSIONS : "receives"
+    PARTICIPANTS ||--o{ ASSIGNMENT_SUBMISSIONS : "submits"
+    ASSESSMENTS ||--o{ ASSIGNMENT_SUBMISSIONS : "linked to"
+    
+    RESOURCES ||--o{ BATCH_RESOURCES : "assigned to"
+    BATCHES ||--o{ BATCH_RESOURCES : "has access"
+    COACHES ||--o{ BATCH_RESOURCES : "unlocks"
+    
+    COACHES ||--o{ QUIZZES : "creates"
+    QUIZZES ||--o{ QUIZ_SESSIONS : "runs"
+    QUIZ_SESSIONS ||--o{ QUIZ_RESPONSES : "collects"
+    BATCHES ||--o{ QUIZ_SESSIONS : "participates"
+    
+    COACHES ||--o{ COACH_COMPANIES : "assigned to"
+    COMPANIES ||--o{ COACH_COMPANIES : "works with"
+    
+    PARTICIPANTS ||--o{ CRM_SYNC_LOG : "synced"
+    INTERVIEW_CANDIDATES ||--o| PARTICIPANTS : "converts to"
+        </div>
+    </div>
+    
+    <div class="legend">
+        <h3>Legend</h3>
+        <ul>
+            <li><strong>PK</strong> - Primary Key (Unique identifier for each record)</li>
+            <li><strong>FK</strong> - Foreign Key (Reference to another table)</li>
+            <li><strong>UK</strong> - Unique Key (Must be unique across the table)</li>
+            <li><strong>||--o|</strong> - One-to-One relationship</li>
+            <li><strong>||--o{</strong> - One-to-Many relationship</li>
+            <li><strong>||--||</strong> - One-to-One mandatory relationship</li>
+        </ul>
+    </div>
+    
+    <div class="table-section">
+        <h3>Key Design Decisions</h3>
+        <ul>
+            <li><strong>User Management:</strong> Single USERS table with role-based differentiation through separate profile tables (PARTICIPANTS, COACHES, ADMINS)</li>
+            <li><strong>Assessment Storage:</strong> Dual result storage - calculated_result (auto-generated) and final_result (editable with freeze period)</li>
+            <li><strong>Batch Management:</strong> Flexible batch system allowing participants to move between batches with progress tracking</li>
+            <li><strong>Interview Candidates:</strong> Separate tracking until conversion to participant, with assessment package quota management</li>
+            <li><strong>Quiz System:</strong> Live quiz responses not permanently stored as per requirements</li>
+            <li><strong>Resource Access:</strong> View-only resources with batch-wise unlocking by coaches</li>
+            <li><strong>CRM Integration:</strong> Sync log table for tracking data transfers to external CRM</li>
+            <li><strong>Audit Trail:</strong> Comprehensive logging of all user actions and data changes</li>
+        </ul>
+    </div>
+    
+    <div class="table-section">
+        <h3>Database Tables Summary</h3>
+        <div class="attributes">
+            <h4>Core User Management (5 tables)</h4>
+            <ul>
+                <li>USERS - Central authentication and user information</li>
+                <li>PARTICIPANTS - Employee/individual specific data</li>
+                <li>COACHES - Trainer/coach specific data</li>
+                <li>COMPANIES - Organization management</li>
+                <li>ADMINS - Platform administrators</li>
+            </ul>
+            
+            <h4>Training & Batch Management (2 tables)</h4>
+            <ul>
+                <li>BATCHES - Training batch configuration</li>
+                <li>BATCH_PARTICIPANTS - Enrollment tracking</li>
+            </ul>
+            
+            <h4>Assessment System (5 tables)</h4>
+            <ul>
+                <li>ASSESSMENT_TOOLS - Tool definitions (Inner Drives, N1, etc.)</li>
+                <li>ASSESSMENTS - Individual assessment instances</li>
+                <li>ASSESSMENT_RESULTS - Dual result storage</li>
+                <li>QUESTIONS - Tool-specific questions</li>
+                <li>PARTICIPANT_ANSWERS - Response tracking</li>
+            </ul>
+            
+            <h4>Assignments & Resources (4 tables)</h4>
+            <ul>
+                <li>ASSIGNMENTS - Task definitions</li>
+                <li>ASSIGNMENT_SUBMISSIONS - Submission tracking</li>
+                <li>RESOURCES - Learning materials</li>
+                <li>BATCH_RESOURCES - Resource access control</li>
+            </ul>
+            
+            <h4>Interview Management (2 tables)</h4>
+            <ul>
+                <li>INTERVIEW_CANDIDATES - Candidate tracking</li>
+                <li>ASSESSMENT_PACKAGES - Quota management</li>
+            </ul>
+            
+            <h4>Quiz System (3 tables)</h4>
+            <ul>
+                <li>QUIZZES - Quiz definitions</li>
+                <li>QUIZ_SESSIONS - Live session management</li>
+                <li>QUIZ_RESPONSES - Temporary response storage</li>
+            </ul>
+            
+            <h4>Supporting Tables (3 tables)</h4>
+            <ul>
+                <li>COACH_COMPANIES - Many-to-many relationship</li>
+                <li>SYSTEM_SETTINGS - Global configuration</li>
+                <li>CRM_SYNC_LOG - Integration tracking</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#E8F4F8',
+                primaryTextColor: '#2C3E50',
+                primaryBorderColor: '#2C3E50',
+                lineColor: '#5D6D7E',
+                secondaryColor: '#FFE5B4',
+                tertiaryColor: '#D4E6F1'
+            },
+            er: {
+                layoutDirection: 'TB',
+                minEntityWidth: 100,
+                minEntityHeight: 75,
+                entityPadding: 15,
+                stroke: '#2C3E50',
+                fill: '#E8F4F8'
+            }
+        });
+    </script>
+</body>
+</html>

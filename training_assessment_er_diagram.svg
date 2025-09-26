@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="2000" viewBox="0 0 2400 2000">
+    <defs>
+        <style>
+            .entity { fill: #E8F4FD; stroke: #1976D2; stroke-width: 2; }
+            .entity-title { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #1976D2; }
+            .entity-attr { font-family: Arial, sans-serif; font-size: 11px; fill: #333; }
+            .entity-pk { font-weight: bold; fill: #D32F2F; }
+            .entity-fk { font-style: italic; fill: #1976D2; }
+            .relationship { stroke: #666; stroke-width: 1.5; fill: none; }
+            .relationship-label { font-family: Arial, sans-serif; font-size: 10px; fill: #666; }
+            .title { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; fill: #333; }
+        </style>
+    </defs>
+    
+    <!-- Title -->
+    <text x="1200" y="40" class="title" text-anchor="middle">Training &amp; Assessment Management Platform - Entity Relationship Diagram</text>
+    
+    <!-- Entities -->
+    
+    <!-- Row 1 -->
+    <!-- USERS -->
+    <g id="users">
+        <rect x="100" y="100" width="200" height="180" class="entity" rx="5"/>
+        <text x="200" y="120" class="entity-title" text-anchor="middle">USERS</text>
+        <line x1="100" y1="130" x2="300" y2="130" stroke="#1976D2" stroke-width="1"/>
+        <text x="110" y="150" class="entity-attr entity-pk">PK: user_id</text>
+        <text x="110" y="165" class="entity-attr">email</text>
+        <text x="110" y="180" class="entity-attr">password_hash</text>
+        <text x="110" y="195" class="entity-attr">first_name</text>
+        <text x="110" y="210" class="entity-attr">last_name</text>
+        <text x="110" y="225" class="entity-attr">phone</text>
+        <text x="110" y="240" class="entity-attr">user_type</text>
+        <text x="110" y="255" class="entity-attr">is_active</text>
+        <text x="110" y="270" class="entity-attr">created_at</text>
+    </g>
+    
+    <!-- COMPANIES -->
+    <g id="companies">
+        <rect x="400" y="100" width="200" height="180" class="entity" rx="5"/>
+        <text x="500" y="120" class="entity-title" text-anchor="middle">COMPANIES</text>
+        <line x1="400" y1="130" x2="600" y2="130" stroke="#1976D2" stroke-width="1"/>
+        <text x="410" y="150" class="entity-attr entity-pk">PK: company_id</text>
+        <text x="410" y="165" class="entity-attr">company_name</text>
+        <text x="410" y="180" class="entity-attr">industry</text>
+        <text x="410" y="195" class="entity-attr">hr_contact_email</text>
+        <text x="410" y="210" class="entity-attr">hr_contact_phone</text>
+        <text x="410" y="225" class="entity-attr">address</text>
+        <text x="410" y="240" class="entity-attr">max_employees</text>
+        <text x="410" y="255" class="entity-attr">contract_start_date</text>
+        <text x="410" y="270" class="entity-attr">contract_end_date</text>
+    </g>
+    
+    <!-- ADMINS -->
+    <g id="admins">
+        <rect x="700" y="100" width="200" height="120" class="entity" rx="5"/>
+        <text x="800" y="120" class="entity-title" text-anchor="middle">ADMINS</text>
+        <line x1="700" y1="130" x2="900" y2="130" stroke="#1976D2" stroke-width="1"/>
+        <text x="710" y="150" class="entity-attr entity-pk">PK: admin_id</text>
+        <text x="710" y="165" class="entity-attr entity-fk">FK: user_id</text>
+        <text x="710" y="180" class="entity-attr">role_level</text>
+        <text x="710" y="195" class="entity-attr">permissions</text>
+        <text x="710" y="210" class="entity-attr">created_at</text>
+    </g>
+    
+    <!-- ASSESSMENT_TOOLS -->
+    <g id="assessment_tools">
+        <rect x="1000" y="100" width="200" height="150" class="entity" rx="5"/>
+        <text x="1100" y="120" class="entity-title" text-anchor="middle">ASSESSMENT_TOOLS</text>
+        <line x1="1000" y1="130" x2="1200" y2="130" stroke="#1976D2" stroke-width="1"/>
+        <text x="1010" y="150" class="entity-attr entity-pk">PK: tool_id</text>
+        <text x="1010" y="165" class="entity-attr">tool_name</text>
+        <text x="1010" y="180" class="entity-attr">tool_code</text>
+        <text x="1010" y="195" class="entity-attr">description</text>
+        <text x="1010" y="210" class="entity-attr">version</text>
+        <text x="1010" y="225" class="entity-attr">is_active</text>
+        <text x="1010" y="240" class="entity-attr">created_at</text>
+    </g>
+    
+    <!-- QUESTIONS -->
+    <g id="questions">
+        <rect x="1300" y="100" width="200" height="150" class="entity" rx="5"/>
+        <text x="1400" y="120" class="entity-title" text-anchor="middle">QUESTIONS</text>
+        <line x1="1300" y1="130" x2="1500" y2="130" stroke="#1976D2" stroke-width="1"/>
+        <text x="1310" y="150" class="entity-attr entity-pk">PK: question_id</text>
+        <text x="1310" y="165" class="entity-attr entity-fk">FK: tool_id</text>
+        <text x="1310" y="180" class="entity-attr">question_text</text>
+        <text x="1310" y="195" class="entity-attr">question_type</text>
+        <text x="1310" y="210" class="entity-attr">options_json</text>
+        <text x="1310" y="225" class="entity-attr">order_index</text>
+        <text x="1310" y="240" class="entity-attr">is_required</text>
+    </g>
+    
+    <!-- Row 2 -->
+    <!-- PARTICIPANTS -->
+    <g id="participants">
+        <rect x="100" y="350" width="200" height="210" class="entity" rx="5"/>
+        <text x="200" y="370" class="entity-title" text-anchor="middle">PARTICIPANTS</text>
+        <line x1="100" y1="380" x2="300" y2="380" stroke="#1976D2" stroke-width="1"/>
+        <text x="110" y="400" class="entity-attr entity-pk">PK: participant_id</text>
+        <text x="110" y="415" class="entity-attr entity-fk">FK: user_id</text>
+        <text x="110" y="430" class="entity-attr entity-fk">FK: company_id</text>
+        <text x="110" y="445" class="entity-attr entity-fk">FK: batch_id</text>
+        <text x="110" y="460" class="entity-attr">designation</text>
+        <text x="110" y="475" class="entity-attr">department</text>
+        <text x="110" y="490" class="entity-attr">employee_id</text>
+        <text x="110" y="505" class="entity-attr">participant_type</text>
+        <text x="110" y="520" class="entity-attr">joining_date</text>
+        <text x="110" y="535" class="entity-attr">is_interview_candidate</text>
+        <text x="110" y="550" class="entity-attr">hired_date</text>
+    </g>
+    
+    <!-- COACHES -->
+    <g id="coaches">
+        <rect x="400" y="350" width="200" height="150" class="entity" rx="5"/>
+        <text x="500" y="370" class="entity-title" text-anchor="middle">COACHES</text>
+        <line x1="400" y1="380" x2="600" y2="380" stroke="#1976D2" stroke-width="1"/>
+        <text x="410" y="400" class="entity-attr entity-pk">PK: coach_id</text>
+        <text x="410" y="415" class="entity-attr entity-fk">FK: user_id</text>
+        <text x="410" y="430" class="entity-attr">specialization</text>
+        <text x="410" y="445" class="entity-attr">experience_years</text>
+        <text x="410" y="460" class="entity-attr">certification</text>
+        <text x="410" y="475" class="entity-attr">bio</text>
+        <text x="410" y="490" class="entity-attr">created_at</text>
+    </g>
+    
+    <!-- BATCHES -->
+    <g id="batches">
+        <rect x="700" y="350" width="200" height="180" class="entity" rx="5"/>
+        <text x="800" y="370" class="entity-title" text-anchor="middle">BATCHES</text>
+        <line x1="700" y1="380" x2="900" y2="380" stroke="#1976D2" stroke-width="1"/>
+        <text x="710" y="400" class="entity-attr entity-pk">PK: batch_id</text>
+        <text x="710" y="415" class="entity-attr entity-fk">FK: company_id</text>
+        <text x="710" y="430" class="entity-attr entity-fk">FK: coach_id</text>
+        <text x="710" y="445" class="entity-attr">batch_name</text>
+        <text x="710" y="460" class="entity-attr">batch_code</text>
+        <text x="710" y="475" class="entity-attr">start_date</text>
+        <text x="710" y="490" class="entity-attr">end_date</text>
+        <text x="710" y="505" class="entity-attr">max_participants</text>
+        <text x="710" y="520" class="entity-attr">status</text>
+    </g>
+    
+    <!-- ASSESSMENTS -->
+    <g id="assessments">
+        <rect x="1000" y="350" width="200" height="210" class="entity" rx="5"/>
+        <text x="1100" y="370" class="entity-title" text-anchor="middle">ASSESSMENTS</text>
+        <line x1="1000" y1="380" x2="1200" y2="380" stroke="#1976D2" stroke-width="1"/>
+        <text x="1010" y="400" class="entity-attr entity-pk">PK: assessment_id</text>
+        <text x="1010" y="415" class="entity-attr entity-fk">FK: participant_id</text>
+        <text x="1010" y="430" class="entity-attr entity-fk">FK: tool_id</text>
+        <text x="1010" y="445" class="entity-attr entity-fk">FK: batch_id</text>
+        <text x="1010" y="460" class="entity-attr">assessment_date</text>
+        <text x="1010" y="475" class="entity-attr">status</text>
+        <text x="1010" y="490" class="entity-attr">start_time</text>
+        <text x="1010" y="505" class="entity-attr">end_time</text>
+        <text x="1010" y="520" class="entity-attr">assessment_score</text>
+        <text x="1010" y="535" class="entity-attr">is_locked</text>
+        <text x="1010" y="550" class="entity-attr">locked_date</text>
+    </g>
+    
+    <!-- ASSESSMENT_RESULTS -->
+    <g id="assessment_results">
+        <rect x="1300" y="350" width="200" height="165" class="entity" rx="5"/>
+        <text x="1400" y="370" class="entity-title" text-anchor="middle">ASSESSMENT_RESULTS</text>
+        <line x1="1300" y1="380" x2="1500" y2="380" stroke="#1976D2" stroke-width="1"/>
+        <text x="1310" y="400" class="entity-attr entity-pk">PK: result_id</text>
+        <text x="1310" y="415" class="entity-attr entity-fk">FK: assessment_id</text>
+        <text x="1310" y="430" class="entity-attr">result_type</text>
+        <text x="1310" y="445" class="entity-attr">calculated_result</text>
+        <text x="1310" y="460" class="entity-attr">final_result</text>
+        <text x="1310" y="475" class="entity-attr">edited_by</text>
+        <text x="1310" y="490" class="entity-attr">edit_date</text>
+        <text x="1310" y="505" class="entity-attr">freeze_date</text>
+    </g>
+    
+    <!-- Row 3 -->
+    <!-- ASSIGNMENTS -->
+    <g id="assignments">
+        <rect x="100" y="620" width="200" height="165" class="entity" rx="5"/>
+        <text x="200" y="640" class="entity-title" text-anchor="middle">ASSIGNMENTS</text>
+        <line x1="100" y1="650" x2="300" y2="650" stroke="#1976D2" stroke-width="1"/>
+        <text x="110" y="670" class="entity-attr entity-pk">PK: assignment_id</text>
+        <text x="110" y="685" class="entity-attr entity-fk">FK: tool_id</text>
+        <text x="110" y="700" class="entity-attr">title</text>
+        <text x="110" y="715" class="entity-attr">description</text>
+        <text x="110" y="730" class="entity-attr">instructions</text>
+        <text x="110" y="745" class="entity-attr">due_days</text>
+        <text x="110" y="760" class="entity-attr">max_score</text>
+        <text x="110" y="775" class="entity-attr">created_at</text>
+    </g>
+    
+    <!-- PARTICIPANT_ASSIGNMENTS -->
+    <g id="participant_assignments">
+        <rect x="400" y="620" width="220" height="195" class="entity" rx="5"/>
+        <text x="510" y="640" class="entity-title" text-anchor="middle">PARTICIPANT_ASSIGNMENTS</text>
+        <line x1="400" y1="650" x2="620" y2="650" stroke="#1976D2" stroke-width="1"/>
+        <text x="410" y="670" class="entity-attr entity-pk">PK: participant_assignment_id</text>
+        <text x="410" y="685" class="entity-attr entity-fk">FK: assignment_id</text>
+        <text x="410" y="700" class="entity-attr entity-fk">FK: participant_id</text>
+        <text x="410" y="715" class="entity-attr entity-fk">FK: batch_id</text>
+        <text x="410" y="730" class="entity-attr">assigned_date</text>
+        <text x="410" y="745" class="entity-attr">due_date</text>
+        <text x="410" y="760" class="entity-attr">submission_date</text>
+        <text x="410" y="775" class="entity-attr">submission_file</text>
+        <text x="410" y="790" class="entity-attr">score</text>
+        <text x="410" y="805" class="entity-attr">status</text>
+    </g>
+    
+    <!-- RESOURCES -->
+    <g id="resources">
+        <rect x="700" y="620" width="200" height="165" class="entity" rx="5"/>
+        <text x="800" y="640" class="entity-title" text-anchor="middle">RESOURCES</text>
+        <line x1="700" y1="650" x2="900" y2="650" stroke="#1976D2" stroke-width="1"/>
+        <text x="710" y="670" class="entity-attr entity-pk">PK: resource_id</text>
+        <text x="710" y="685" class="entity-attr entity-fk">FK: tool_id</text>
+        <text x="710" y="700" class="entity-attr">title</text>
+        <text x="710" y="715" class="entity-attr">description</text>
+        <text x="710" y="730" class="entity-attr">resource_type</text>
+        <text x="710" y="745" class="entity-attr">file_path</text>
+        <text x="710" y="760" class="entity-attr">url</text>
+        <text x="710" y="775" class="entity-attr">is_downloadable</text>
+    </g>
+    
+    <!-- BATCH_RESOURCES -->
+    <g id="batch_resources">
+        <rect x="1000" y="620" width="200" height="135" class="entity" rx="5"/>
+        <text x="1100" y="640" class="entity-title" text-anchor="middle">BATCH_RESOURCES</text>
+        <line x1="1000" y1="650" x2="1200" y2="650" stroke="#1976D2" stroke-width="1"/>
+        <text x="1010" y="670" class="entity-attr entity-pk">PK: batch_resource_id</text>
+        <text x="1010" y="685" class="entity-attr entity-fk">FK: batch_id</text>
+        <text x="1010" y="700" class="entity-attr entity-fk">FK: resource_id</text>
+        <text x="1010" y="715" class="entity-attr">unlocked_date</text>
+        <text x="1010" y="730" class="entity-attr">unlocked_by</text>
+        <text x="1010" y="745" class="entity-attr">access_level</text>
+    </g>
+    
+    <!-- ASSESSMENT_RESPONSES -->
+    <g id="assessment_responses">
+        <rect x="1300" y="620" width="200" height="135" class="entity" rx="5"/>
+        <text x="1400" y="640" class="entity-title" text-anchor="middle">ASSESSMENT_RESPONSES</text>
+        <line x1="1300" y1="650" x2="1500" y2="650" stroke="#1976D2" stroke-width="1"/>
+        <text x="1310" y="670" class="entity-attr entity-pk">PK: response_id</text>
+        <text x="1310" y="685" class="entity-attr entity-fk">FK: assessment_id</text>
+        <text x="1310" y="700" class="entity-attr entity-fk">FK: question_id</text>
+        <text x="1310" y="715" class="entity-attr">response_value</text>
+        <text x="1310" y="730" class="entity-attr">response_time</text>
+        <text x="1310" y="745" class="entity-attr">created_at</text>
+    </g>
+    
+    <!-- Row 4 -->
+    <!-- QUIZZES -->
+    <g id="quizzes">
+        <rect x="100" y="870" width="200" height="150" class="entity" rx="5"/>
+        <text x="200" y="890" class="entity-title" text-anchor="middle">QUIZZES</text>
+        <line x1="100" y1="900" x2="300" y2="900" stroke="#1976D2" stroke-width="1"/>
+        <text x="110" y="920" class="entity-attr entity-pk">PK: quiz_id</text>
+        <text x="110" y="935" class="entity-attr">title</text>
+        <text x="110" y="950" class="entity-attr">description</text>
+        <text x="110" y="965" class="entity-attr">duration_minutes</text>
+        <text x="110" y="980" class="entity-attr">total_questions</text>
+        <text x="110" y="995" class="entity-attr">access_code</text>
+        <text x="110" y="1010" class="entity-attr">is_active</text>
+    </g>
+    
+    <!-- QUIZ_QUESTIONS -->
+    <g id="quiz_questions">
+        <rect x="400" y="870" width="200" height="150" class="entity" rx="5"/>
+        <text x="500" y="890" class="entity-title" text-anchor="middle">QUIZ_QUESTIONS</text>
+        <line x1="400" y1="900" x2="600" y2="900" stroke="#1976D2" stroke-width="1"/>
+        <text x="410" y="920" class="entity-attr entity-pk">PK: quiz_question_id</text>
+        <text x="410" y="935" class="entity-attr entity-fk">FK: quiz_id</text>
+        <text x="410" y="950" class="entity-attr">question_text</text>
+        <text x="410" y="965" class="entity-attr">options_json</text>
+        <text x="410" y="980" class="entity-attr">correct_answer</text>
+        <text x="410" y="995" class="entity-attr">points</text>
+        <text x="410" y="1010" class="entity-attr">order_index</text>
+    </g>
+    
+    <!-- QUIZ_SESSIONS -->
+    <g id="quiz_sessions">
+        <rect x="700" y="870" width="200" height="150" class="entity" rx="5"/>
+        <text x="800" y="890" class="entity-title" text-anchor="middle">QUIZ_SESSIONS</text>
+        <line x1="700" y1="900" x2="900" y2="900" stroke="#1976D2" stroke-width="1"/>
+        <text x="710" y="920" class="entity-attr entity-pk">PK: session_id</text>
+        <text x="710" y="935" class="entity-attr entity-fk">FK: quiz_id</text>
+        <text x="710" y="950" class="entity-attr entity-fk">FK: batch_id</text>
+        <text x="710" y="965" class="entity-attr entity-fk">FK: coach_id</text>
+        <text x="710" y="980" class="entity-attr">start_time</text>
+        <text x="710" y="995" class="entity-attr">end_time</text>
+        <text x="710" y="1010" class="entity-attr">access_link</text>
+    </g>
+    
+    <!-- QUIZ_RESPONSES -->
+    <g id="quiz_responses">
+        <rect x="1000" y="870" width="200" height="150" class="entity" rx="5"/>
+        <text x="1100" y="890" class="entity-title" text-anchor="middle">QUIZ_RESPONSES</text>
+        <line x1="1000" y1="900" x2="1200" y2="900" stroke="#1976D2" stroke-width="1"/>
+        <text x="1010" y="920" class="entity-attr entity-pk">PK: response_id</text>
+        <text x="1010" y="935" class="entity-attr entity-fk">FK: session_id</text>
+        <text x="1010" y="950" class="entity-attr entity-fk">FK: participant_id</text>
+        <text x="1010" y="965" class="entity-attr entity-fk">FK: quiz_question_id</text>
+        <text x="1010" y="980" class="entity-attr">response</text>
+        <text x="1010" y="995" class="entity-attr">is_correct</text>
+        <text x="1010" y="1010" class="entity-attr">response_time</text>
+    </g>
+    
+    <!-- COMPANY_PACKAGES -->
+    <g id="company_packages">
+        <rect x="1300" y="870" width="200" height="150" class="entity" rx="5"/>
+        <text x="1400" y="890" class="entity-title" text-anchor="middle">COMPANY_PACKAGES</text>
+        <line x1="1300" y1="900" x2="1500" y2="900" stroke="#1976D2" stroke-width="1"/>
+        <text x="1310" y="920" class="entity-attr entity-pk">PK: package_id</text>
+        <text x="1310" y="935" class="entity-attr entity-fk">FK: company_id</text>
+        <text x="1310" y="950" class="entity-attr entity-fk">FK: tool_id</text>
+        <text x="1310" y="965" class="entity-attr">total_assessments</text>
+        <text x="1310" y="980" class="entity-attr">used_assessments</text>
+        <text x="1310" y="995" class="entity-attr">package_type</text>
+        <text x="1310" y="1010" class="entity-attr">purchase_date</text>
+    </g>
+    
+    <!-- Row 5 -->
+    <!-- COACH_ASSIGNMENTS -->
+    <g id="coach_assignments">
+        <rect x="100" y="1100" width="200" height="120" class="entity" rx="5"/>
+        <text x="200" y="1120" class="entity-title" text-anchor="middle">COACH_ASSIGNMENTS</text>
+        <line x1="100" y1="1130" x2="300" y2="1130" stroke="#1976D2" stroke-width="1"/>
+        <text x="110" y="1150" class="entity-attr entity-pk">PK: assignment_id</text>
+        <text x="110" y="1165" class="entity-attr entity-fk">FK: coach_id</text>
+        <text x="110" y="1180" class="entity-attr entity-fk">FK: company_id</text>
+        <text x="110" y="1195" class="entity-attr">assigned_date</text>
+        <text x="110" y="1210" class="entity-attr">status</text>
+    </g>
+    
+    <!-- SYSTEM_SETTINGS -->
+    <g id="system_settings">
+        <rect x="400" y="1100" width="200" height="150" class="entity" rx="5"/>
+        <text x="500" y="1120" class="entity-title" text-anchor="middle">SYSTEM_SETTINGS</text>
+        <line x1="400" y1="1130" x2="600" y2="1130" stroke="#1976D2" stroke-width="1"/>
+        <text x="410" y="1150" class="entity-attr entity-pk">PK: setting_id</text>
+        <text x="410" y="1165" class="entity-attr">setting_key</text>
+        <text x="410" y="1180" class="entity-attr">setting_value</text>
+        <text x="410" y="1195" class="entity-attr">setting_type</text>
+        <text x="410" y="1210" class="entity-attr">description</text>
+        <text x="410" y="1225" class="entity-attr">updated_by</text>
+        <text x="410" y="1240" class="entity-attr">updated_at</text>
+    </g>
+    
+    <!-- AUDIT_LOGS -->
+    <g id="audit_logs">
+        <rect x="700" y="1100" width="200" height="150" class="entity" rx="5"/>
+        <text x="800" y="1120" class="entity-title" text-anchor="middle">AUDIT_LOGS</text>
+        <line x1="700" y1="1130" x2="900" y2="1130" stroke="#1976D2" stroke-width="1"/>
+        <text x="710" y="1150" class="entity-attr entity-pk">PK: log_id</text>
+        <text x="710" y="1165" class="entity-attr entity-fk">FK: user_id</text>
+        <text x="710" y="1180" class="entity-attr">action</text>
+        <text x="710" y="1195" class="entity-attr">entity_type</text>
+        <text x="710" y="1210" class="entity-attr">entity_id</text>
+        <text x="710" y="1225" class="entity-attr">old_value</text>
+        <text x="710" y="1240" class="entity-attr">new_value</text>
+    </g>
+    
+    <!-- CRM_SYNC_LOG -->
+    <g id="crm_sync_log">
+        <rect x="1000" y="1100" width="200" height="135" class="entity" rx="5"/>
+        <text x="1100" y="1120" class="entity-title" text-anchor="middle">CRM_SYNC_LOG</text>
+        <line x1="1000" y1="1130" x2="1200" y2="1130" stroke="#1976D2" stroke-width="1"/>
+        <text x="1010" y="1150" class="entity-attr entity-pk">PK: sync_id</text>
+        <text x="1010" y="1165" class="entity-attr entity-fk">FK: participant_id</text>
+        <text x="1010" y="1180" class="entity-attr">sync_type</text>
+        <text x="1010" y="1195" class="entity-attr">sync_status</text>
+        <text x="1010" y="1210" class="entity-attr">sync_data</text>
+        <text x="1010" y="1225" class="entity-attr">sync_timestamp</text>
+    </g>
+    
+    <!-- Relationships -->
+    <!-- Users to Participants -->
+    <line x1="200" y1="280" x2="200" y2="350" class="relationship"/>
+    <text x="210" y="315" class="relationship-label">1:0..1</text>
+    
+    <!-- Users to Coaches -->
+    <line x1="250" y1="280" x2="450" y2="350" class="relationship"/>
+    <text x="350" y="315" class="relationship-label">1:0..1</text>
+    
+    <!-- Users to Admins -->
+    <line x1="300" y1="200" x2="700" y2="200" class="relationship"/>
+    <text x="500" y="195" class="relationship-label">1:0..1</text>
+    
+    <!-- Users to Audit Logs -->
+    <line x1="200" y1="280" x2="800" y2="1100" class="relationship"/>
+    <text x="500" y="690" class="relationship-label">1:N</text>
+    
+    <!-- Companies to Participants -->
+    <line x1="500" y1="280" x2="250" y2="350" class="relationship"/>
+    <text x="375" y="315" class="relationship-label">1:N</text>
+    
+    <!-- Companies to Batches -->
+    <line x1="550" y1="280" x2="750" y2="350" class="relationship"/>
+    <text x="650" y="315" class="relationship-label">1:N</text>
+    
+    <!-- Companies to Company Packages -->
+    <line x1="500" y1="280" x2="1400" y2="870" class="relationship"/>
+    <text x="950" y="575" class="relationship-label">1:N</text>
+    
+    <!-- Companies to Coach Assignments -->
+    <line x1="450" y1="280" x2="200" y2="1100" class="relationship"/>
+    <text x="325" y="690" class="relationship-label">1:N</text>
+    
+    <!-- Participants to Assessments -->
+    <line x1="300" y1="455" x2="1000" y2="455" class="relationship"/>
+    <text x="650" y="450" class="relationship-label">1:N</text>
+    
+    <!-- Participants to Participant Assignments -->
+    <line x1="200" y1="560" x2="510" y2="620" class="relationship"/>
+    <text x="355" y="590" class="relationship-label">1:N</text>
+    
+    <!-- Participants to Quiz Responses -->
+    <line x1="200" y1="560" x2="1100" y2="870" class="relationship"/>
+    <text x="650" y="715" class="relationship-label">1:N</text>
+    
+    <!-- Participants to CRM Sync Log -->
+    <line x1="200" y1="560" x2="1100" y2="1100" class="relationship"/>
+    <text x="650" y="830" class="relationship-label">1:N</text>
+    
+    <!-- Batches to Participants -->
+    <line x1="700" y1="440" x2="300" y2="440" class="relationship"/>
+    <text x="500" y="435" class="relationship-label">1:N</text>
+    
+    <!-- Batches to Assessments -->
+    <line x1="900" y1="440" x2="1000" y2="440" class="relationship"/>
+    <text x="950" y="435" class="relationship-label">1:N</text>
+    
+    <!-- Batches to Participant Assignments -->
+    <line x1="800" y1="530" x2="510" y2="620" class="relationship"/>
+    <text x="655" y="575" class="relationship-label">1:N</text>
+    
+    <!-- Batches to Batch Resources -->
+    <line x1="800" y1="530" x2="1100" y2="620" class="relationship"/>
+    <text x="950" y="575" class="relationship-label">1:N</text>
+    
+    <!-- Batches to Quiz Sessions -->
+    <line x1="800" y1="530" x2="800" y2="870" class="relationship"/>
+    <text x="810" y="700" class="relationship-label">1:N</text>
+    
+    <!-- Coaches to Batches -->
+    <line x1="600" y1="425" x2="700" y2="425" class="relationship"/>
+    <text x="650" y="420" class="relationship-label">1:N</text>
+    
+    <!-- Coaches to Coach Assignments -->
+    <line x1="500" y1="500" x2="200" y2="1100" class="relationship"/>
+    <text x="350" y="800" class="relationship-label">1:N</text>
+    
+    <!-- Coaches to Quiz Sessions -->
+    <line x1="500" y1="500" x2="800" y2="870" class="relationship"/>
+    <text x="650" y="685" class="relationship-label">1:N</text>
+    
+    <!-- Assessment Tools to Questions -->
+    <line x1="1200" y1="175" x2="1300" y2="175" class="relationship"/>
+    <text x="1250" y="170" class="relationship-label">1:N</text>
+    
+    <!-- Assessment Tools to Assessments -->
+    <line x1="1100" y1="250" x2="1100" y2="350" class="relationship"/>
+    <text x="1110" y="300" class="relationship-label">1:N</text>
+    
+    <!-- Assessment Tools to Assignments -->
+    <line x1="1100" y1="250" x2="200" y2="620" class="relationship"/>
+    <text x="650" y="435" class="relationship-label">1:N</text>
+    
+    <!-- Assessment Tools to Resources -->
+    <line x1="1100" y1="250" x2="800" y2="620" class="relationship"/>
+    <text x="950" y="435" class="relationship-label">1:N</text>
+    
+    <!-- Assessment Tools to Company Packages -->
+    <line x1="1100" y1="250" x2="1400" y2="870" class="relationship"/>
+    <text x="1250" y="560" class="relationship-label">1:N</text>
+    
+    <!-- Assessments to Assessment Results -->
+    <line x1="1200" y1="455" x2="1300" y2="455" class="relationship"/>
+    <text x="1250" y="450" class="relationship-label">1:1..N</text>
+    
+    <!-- Assessments to Assessment Responses -->
+    <line x1="1100" y1="560" x2="1400" y2="620" class="relationship"/>
+    <text x="1250" y="590" class="relationship-label">1:N</text>
+    
+    <!-- Questions to Assessment Responses -->
+    <line x1="1400" y1="250" x2="1400" y2="620" class="relationship"/>
+    <text x="1410" y="435" class="relationship-label">1:N</text>
+    
+    <!-- Assignments to Participant Assignments -->
+    <line x1="300" y1="700" x2="400" y2="700" class="relationship"/>
+    <text x="350" y="695" class="relationship-label">1:N</text>
+    
+    <!-- Resources to Batch Resources -->
+    <line x1="900" y1="700" x2="1000" y2="700" class="relationship"/>
+    <text x="950" y="695" class="relationship-label">1:N</text>
+    
+    <!-- Quizzes to Quiz Questions -->
+    <line x1="300" y1="945" x2="400" y2="945" class="relationship"/>
+    <text x="350" y="940" class="relationship-label">1:N</text>
+    
+    <!-- Quizzes to Quiz Sessions -->
+    <line x1="200" y1="1020" x2="800" y2="1020" class="relationship"/>
+    <text x="500" y="1015" class="relationship-label">1:N</text>
+    
+    <!-- Quiz Sessions to Quiz Responses -->
+    <line x1="900" y1="945" x2="1000" y2="945" class="relationship"/>
+    <text x="950" y="940" class="relationship-label">1:N</text>
+    
+    <!-- Quiz Questions to Quiz Responses -->
+    <line x1="500" y1="1020" x2="1100" y2="1020" class="relationship"/>
+    <text x="800" y="1015" class="relationship-label">1:N</text>
+    
+    <!-- Legend -->
+    <g id="legend">
+        <rect x="1600" y="100" width="250" height="200" fill="white" stroke="#999" stroke-width="1" rx="5"/>
+        <text x="1725" y="125" class="entity-title" text-anchor="middle">Legend</text>
+        <line x1="1610" y1="135" x2="1840" y2="135" stroke="#999" stroke-width="1"/>
+        
+        <text x="1620" y="160" font-size="12" font-weight="bold" fill="#D32F2F">PK:</text>
+        <text x="1660" y="160" font-size="12">Primary Key</text>
+        
+        <text x="1620" y="180" font-size="12" font-style="italic" fill="#1976D2">FK:</text>
+        <text x="1660" y="180" font-size="12">Foreign Key</text>
+        
+        <text x="1620" y="200" font-size="12" font-weight="bold">1:1</text>
+        <text x="1660" y="200" font-size="12">One to One</text>
+        
+        <text x="1620" y="220" font-size="12" font-weight="bold">1:N</text>
+        <text x="1660" y="220" font-size="12">One to Many</text>
+        
+        <text x="1620" y="240" font-size="12" font-weight="bold">N:M</text>
+        <text x="1660" y="240" font-size="12">Many to Many</text>
+        
+        <text x="1620" y="260" font-size="12" font-weight="bold">0..1</text>
+        <text x="1660" y="260" font-size="12">Zero or One (Optional)</text>
+        
+        <text x="1620" y="280" font-size="12" font-weight="bold">1..N</text>
+        <text x="1660" y="280" font-size="12">One or More</text>
+    </g>
+</svg>

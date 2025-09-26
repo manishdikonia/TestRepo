@@ -1,0 +1,351 @@
+
+digraph ERD {
+    rankdir=TB;
+    node [shape=record, fontname="Arial", fontsize=10];
+    edge [fontname="Arial", fontsize=9];
+    
+    // Styling
+    graph [bgcolor="white", pad="0.5"];
+    
+    // Main User Management Tables
+    users [label="{USERS|
+        + user_id : INT (PK)\l
+        + email : VARCHAR(255)\l
+        + password_hash : VARCHAR(255)\l
+        + first_name : VARCHAR(100)\l
+        + last_name : VARCHAR(100)\l
+        + role_type : ENUM\l
+        + is_active : BOOLEAN\l
+        + created_at : TIMESTAMP\l
+        + updated_at : TIMESTAMP\l
+    }" fillcolor="#E8F4F8" style=filled];
+    
+    participants [label="{PARTICIPANTS|
+        + participant_id : INT (PK)\l
+        + user_id : INT (FK)\l
+        + company_id : INT (FK)\l
+        + batch_id : INT (FK)\l
+        + designation : VARCHAR(100)\l
+        + department : VARCHAR(100)\l
+        + employee_id : VARCHAR(50)\l
+        + profile_type : ENUM\l
+        + created_at : TIMESTAMP\l
+    }" fillcolor="#E8F4F8" style=filled];
+    
+    coaches [label="{COACHES|
+        + coach_id : INT (PK)\l
+        + user_id : INT (FK)\l
+        + specialization : VARCHAR(255)\l
+        + certification : TEXT\l
+        + experience_years : INT\l
+        + bio : TEXT\l
+        + is_available : BOOLEAN\l
+    }" fillcolor="#E8F4F8" style=filled];
+    
+    companies [label="{COMPANIES|
+        + company_id : INT (PK)\l
+        + company_name : VARCHAR(255)\l
+        + industry : VARCHAR(100)\l
+        + hr_contact_email : VARCHAR(255)\l
+        + hr_contact_phone : VARCHAR(20)\l
+        + address : TEXT\l
+        + contract_details : JSON\l
+        + max_employees : INT\l
+        + is_active : BOOLEAN\l
+        + created_at : TIMESTAMP\l
+    }" fillcolor="#E8F4F8" style=filled];
+    
+    admins [label="{ADMINS|
+        + admin_id : INT (PK)\l
+        + user_id : INT (FK)\l
+        + admin_level : ENUM\l
+        + permissions : JSON\l
+    }" fillcolor="#E8F4F8" style=filled];
+    
+    // Batch Management
+    batches [label="{BATCHES|
+        + batch_id : INT (PK)\l
+        + company_id : INT (FK)\l
+        + coach_id : INT (FK)\l
+        + batch_name : VARCHAR(255)\l
+        + batch_code : VARCHAR(50)\l
+        + max_size : INT\l
+        + current_size : INT\l
+        + start_date : DATE\l
+        + end_date : DATE\l
+        + status : ENUM\l
+    }" fillcolor="#FFE5B4" style=filled];
+    
+    batch_participants [label="{BATCH_PARTICIPANTS|
+        + batch_participant_id : INT (PK)\l
+        + batch_id : INT (FK)\l
+        + participant_id : INT (FK)\l
+        + enrolled_date : DATE\l
+        + completion_status : ENUM\l
+        + progress_percentage : DECIMAL\l
+    }" fillcolor="#FFE5B4" style=filled];
+    
+    // Assessment Management
+    assessment_tools [label="{ASSESSMENT_TOOLS|
+        + tool_id : INT (PK)\l
+        + tool_name : VARCHAR(255)\l
+        + tool_code : VARCHAR(50)\l
+        + description : TEXT\l
+        + question_count : INT\l
+        + duration_minutes : INT\l
+        + scoring_algorithm : JSON\l
+        + is_active : BOOLEAN\l
+        + version : VARCHAR(20)\l
+    }" fillcolor="#D4E6F1" style=filled];
+    
+    assessments [label="{ASSESSMENTS|
+        + assessment_id : INT (PK)\l
+        + participant_id : INT (FK)\l
+        + tool_id : INT (FK)\l
+        + batch_id : INT (FK)\l
+        + assessment_type : ENUM\l
+        + status : ENUM\l
+        + started_at : TIMESTAMP\l
+        + completed_at : TIMESTAMP\l
+        + validity_period : INT\l
+        + attempt_number : INT\l
+    }" fillcolor="#D4E6F1" style=filled];
+    
+    assessment_results [label="{ASSESSMENT_RESULTS|
+        + result_id : INT (PK)\l
+        + assessment_id : INT (FK)\l
+        + raw_score : JSON\l
+        + calculated_result : JSON\l
+        + final_result : JSON\l
+        + is_frozen : BOOLEAN\l
+        + freeze_date : DATE\l
+        + last_edited_by : INT (FK)\l
+        + edit_reason : TEXT\l
+    }" fillcolor="#D4E6F1" style=filled];
+    
+    questions [label="{QUESTIONS|
+        + question_id : INT (PK)\l
+        + tool_id : INT (FK)\l
+        + question_text : TEXT\l
+        + question_type : ENUM\l
+        + options_json : JSON\l
+        + correct_answer : TEXT\l
+        + weight : DECIMAL\l
+        + sequence_order : INT\l
+        + is_mandatory : BOOLEAN\l
+    }" fillcolor="#D4E6F1" style=filled];
+    
+    participant_answers [label="{PARTICIPANT_ANSWERS|
+        + answer_id : INT (PK)\l
+        + assessment_id : INT (FK)\l
+        + question_id : INT (FK)\l
+        + answer_value : TEXT\l
+        + answer_text : TEXT\l
+        + time_spent_seconds : INT\l
+        + submitted_at : TIMESTAMP\l
+    }" fillcolor="#D4E6F1" style=filled];
+    
+    // Assignments and Resources
+    assignments [label="{ASSIGNMENTS|
+        + assignment_id : INT (PK)\l
+        + tool_id : INT (FK)\l
+        + title : VARCHAR(255)\l
+        + description : TEXT\l
+        + instructions : TEXT\l
+        + due_days : INT\l
+        + max_score : DECIMAL\l
+        + is_mandatory : BOOLEAN\l
+    }" fillcolor="#E8DAEF" style=filled];
+    
+    assignment_submissions [label="{ASSIGNMENT_SUBMISSIONS|
+        + submission_id : INT (PK)\l
+        + assignment_id : INT (FK)\l
+        + participant_id : INT (FK)\l
+        + assessment_id : INT (FK)\l
+        + submission_text : TEXT\l
+        + file_path : VARCHAR(500)\l
+        + submitted_at : TIMESTAMP\l
+        + score : DECIMAL\l
+        + feedback : TEXT\l
+    }" fillcolor="#E8DAEF" style=filled];
+    
+    resources [label="{RESOURCES|
+        + resource_id : INT (PK)\l
+        + tool_id : INT (FK)\l
+        + resource_name : VARCHAR(255)\l
+        + resource_type : ENUM\l
+        + file_path : VARCHAR(500)\l
+        + url : VARCHAR(500)\l
+        + access_level : ENUM\l
+        + is_downloadable : BOOLEAN\l
+        + sequence_order : INT\l
+    }" fillcolor="#E8DAEF" style=filled];
+    
+    batch_resources [label="{BATCH_RESOURCES|
+        + batch_resource_id : INT (PK)\l
+        + batch_id : INT (FK)\l
+        + resource_id : INT (FK)\l
+        + coach_id : INT (FK)\l
+        + unlocked_at : TIMESTAMP\l
+        + locked_at : TIMESTAMP\l
+        + access_type : ENUM\l
+    }" fillcolor="#E8DAEF" style=filled];
+    
+    // Interview Management
+    interview_candidates [label="{INTERVIEW_CANDIDATES|
+        + candidate_id : INT (PK)\l
+        + company_id : INT (FK)\l
+        + email : VARCHAR(255)\l
+        + full_name : VARCHAR(255)\l
+        + phone : VARCHAR(20)\l
+        + position_applied : VARCHAR(255)\l
+        + assessment_link : VARCHAR(500)\l
+        + link_expiry : TIMESTAMP\l
+        + status : ENUM\l
+        + converted_to_participant : INT (FK)\l
+    }" fillcolor="#FADBD8" style=filled];
+    
+    assessment_packages [label="{ASSESSMENT_PACKAGES|
+        + package_id : INT (PK)\l
+        + company_id : INT (FK)\l
+        + package_name : VARCHAR(255)\l
+        + tool_quotas_json : JSON\l
+        + purchased_date : DATE\l
+        + expiry_date : DATE\l
+        + total_assessments : INT\l
+        + used_assessments : INT\l
+    }" fillcolor="#FADBD8" style=filled];
+    
+    // Quiz Management
+    quizzes [label="{QUIZZES|
+        + quiz_id : INT (PK)\l
+        + coach_id : INT (FK)\l
+        + quiz_name : VARCHAR(255)\l
+        + quiz_code : VARCHAR(50)\l
+        + questions_json : JSON\l
+        + duration_minutes : INT\l
+        + is_live : BOOLEAN\l
+    }" fillcolor="#D5F4E6" style=filled];
+    
+    quiz_sessions [label="{QUIZ_SESSIONS|
+        + session_id : INT (PK)\l
+        + quiz_id : INT (FK)\l
+        + batch_id : INT (FK)\l
+        + access_code : VARCHAR(50)\l
+        + qr_code : TEXT\l
+        + started_at : TIMESTAMP\l
+        + ended_at : TIMESTAMP\l
+    }" fillcolor="#D5F4E6" style=filled];
+    
+    quiz_responses [label="{QUIZ_RESPONSES|
+        + response_id : INT (PK)\l
+        + session_id : INT (FK)\l
+        + participant_name : VARCHAR(255)\l
+        + participant_email : VARCHAR(255)\l
+        + responses_json : JSON\l
+        + score : DECIMAL\l
+        + submitted_at : TIMESTAMP\l
+    }" fillcolor="#D5F4E6" style=filled];
+    
+    // Supporting Tables
+    coach_companies [label="{COACH_COMPANIES|
+        + coach_company_id : INT (PK)\l
+        + coach_id : INT (FK)\l
+        + company_id : INT (FK)\l
+        + assigned_date : DATE\l
+        + is_active : BOOLEAN\l
+    }" fillcolor="#F5F5F5" style=filled];
+    
+    system_settings [label="{SYSTEM_SETTINGS|
+        + setting_id : INT (PK)\l
+        + setting_key : VARCHAR(100)\l
+        + setting_value : TEXT\l
+        + setting_type : VARCHAR(50)\l
+        + description : TEXT\l
+        + updated_by : INT (FK)\l
+        + updated_at : TIMESTAMP\l
+    }" fillcolor="#F5F5F5" style=filled];
+    
+    crm_sync_log [label="{CRM_SYNC_LOG|
+        + sync_id : INT (PK)\l
+        + participant_id : INT (FK)\l
+        + sync_type : ENUM\l
+        + sync_data_json : JSON\l
+        + sync_status : ENUM\l
+        + error_message : TEXT\l
+        + synced_at : TIMESTAMP\l
+    }" fillcolor="#F5F5F5" style=filled];
+    
+    audit_logs [label="{AUDIT_LOGS|
+        + log_id : INT (PK)\l
+        + user_id : INT (FK)\l
+        + action : VARCHAR(100)\l
+        + entity_type : VARCHAR(50)\l
+        + entity_id : INT\l
+        + old_values : JSON\l
+        + new_values : JSON\l
+        + ip_address : VARCHAR(45)\l
+        + created_at : TIMESTAMP\l
+    }" fillcolor="#F5F5F5" style=filled];
+    
+    // Define relationships
+    // User relationships
+    users -> participants [label="1:1" style=solid];
+    users -> coaches [label="1:1" style=solid];
+    users -> admins [label="1:1" style=solid];
+    
+    // Company relationships
+    companies -> participants [label="1:N" style=solid];
+    companies -> batches [label="1:N" style=solid];
+    companies -> interview_candidates [label="1:N" style=solid];
+    companies -> assessment_packages [label="1:N" style=solid];
+    
+    // Batch relationships
+    batches -> batch_participants [label="1:N" style=solid];
+    participants -> batch_participants [label="1:N" style=solid];
+    coaches -> batches [label="1:N" style=solid];
+    batches -> quiz_sessions [label="1:N" style=solid];
+    
+    // Assessment relationships
+    assessment_tools -> assessments [label="1:N" style=solid];
+    assessment_tools -> questions [label="1:N" style=solid];
+    assessment_tools -> assignments [label="1:N" style=solid];
+    assessment_tools -> resources [label="1:N" style=solid];
+    
+    participants -> assessments [label="1:N" style=solid];
+    batches -> assessments [label="1:N" style=solid];
+    assessments -> assessment_results [label="1:1" style=solid];
+    assessments -> participant_answers [label="1:N" style=solid];
+    questions -> participant_answers [label="1:N" style=solid];
+    
+    // Assignment relationships
+    assignments -> assignment_submissions [label="1:N" style=solid];
+    participants -> assignment_submissions [label="1:N" style=solid];
+    assessments -> assignment_submissions [label="1:N" style=solid];
+    
+    // Resource relationships
+    resources -> batch_resources [label="1:N" style=solid];
+    batches -> batch_resources [label="1:N" style=solid];
+    coaches -> batch_resources [label="1:N" style=solid];
+    
+    // Quiz relationships
+    coaches -> quizzes [label="1:N" style=solid];
+    quizzes -> quiz_sessions [label="1:N" style=solid];
+    quiz_sessions -> quiz_responses [label="1:N" style=solid];
+    
+    // Coach-Company relationship
+    coaches -> coach_companies [label="1:N" style=solid];
+    companies -> coach_companies [label="1:N" style=solid];
+    
+    // CRM Sync
+    participants -> crm_sync_log [label="1:N" style=solid];
+    
+    // Audit
+    users -> audit_logs [label="1:N" style=solid];
+    
+    // System Settings
+    admins -> system_settings [label="N:N" style=dashed];
+    
+    // Interview candidate conversion
+    interview_candidates -> participants [label="0:1" style=dashed arrowhead=empty];
+}
