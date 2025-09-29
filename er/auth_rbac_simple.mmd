@@ -1,0 +1,42 @@
+graph TB
+    %% Style definitions
+    classDef authStyle fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#fff
+    classDef userStyle fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#fff
+    classDef orgStyle fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#fff
+    classDef contentStyle fill:#9C27B0,stroke:#6A1B9A,stroke-width:2px,color:#fff
+    classDef assessStyle fill:#F44336,stroke:#C62828,stroke-width:2px,color:#fff
+    
+    %% Main Components
+    subgraph " "
+        AUTH[🔐 Authentication & RBAC]
+        ORG[🏢 Organization Management]
+        USER[👤 User Management]
+        LEARN[📚 Learning Platform]
+        ASSESS[📝 Assessment System]
+        CONTENT[📂 Content Resources]
+        QUIZ[❓ Quiz System]
+        SETTINGS[⚙️ System Settings]
+    end
+    
+    %% Core Relationships
+    AUTH --> |Controls Access| USER
+    AUTH --> |Assigns Roles| ORG
+    ORG --> |Manages| USER
+    USER --> |Enrolls In| LEARN
+    LEARN --> |Provides| CONTENT
+    LEARN --> |Conducts| ASSESS
+    ASSESS --> |Includes| QUIZ
+    SETTINGS --> |Configures| AUTH
+    
+    %% Data Flow
+    USER -.-> |Submits| ASSESS
+    USER -.-> |Accesses| CONTENT
+    USER -.-> |Takes| QUIZ
+    ORG -.-> |Creates| LEARN
+    
+    %% Apply styles
+    class AUTH authStyle
+    class USER userStyle
+    class ORG orgStyle
+    class LEARN,CONTENT contentStyle
+    class ASSESS,QUIZ assessStyle
