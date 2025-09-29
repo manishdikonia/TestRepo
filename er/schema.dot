@@ -1,47 +1,58 @@
 digraph ERD {
-  graph [rankdir=LR, splines=true, overlap=false];
-  node [shape=record, fontname="Helvetica", fontsize=10];
-  edge [color="#555555", arrowsize=0.7];
+  graph [rankdir=LR, splines=ortho, overlap=false, nodesep=0.4, ranksep=1.0, bgcolor="white"];
+  node [shape=record, style="rounded,filled", fillcolor="#ffffff", color="#333333", fontname="Helvetica", fontsize=10];
+  edge [color="#666666", arrowsize=0.7];
 
-  roles [label="{roles|role_id (PK)\lrole_name\l}"];
-  permissions [label="{permissions|permission_id (PK)\lpermission_name\l}"];
-  role_permissions [label="{role_permissions|role_id (FK)\lpermission_id (FK)\l}"];
+  subgraph cluster_auth {
+    label="Auth & RBAC"; color="#dddddd"; style=rounded;
+    roles [label="{roles|role_id (PK)\lrole_name\l}"];
+    permissions [label="{permissions|permission_id (PK)\lpermission_name\l}"];
+    role_permissions [label="{role_permissions|role_id (FK)\lpermission_id (FK)\l}"];
+  }
 
-  companies [label="{companies|company_id (PK)\lcompany_name\l}"];
-  users [label="{users|user_id (PK)\lcompany_id (FK)\lemail\lcreated_by (FK)\l}"];
-  user_roles [label="{user_roles|user_id (FK)\lrole_id (FK)\lcompany_id (FK)\lassigned_by (FK)\l}"];
-  company_coaches [label="{company_coaches|company_id (FK)\lcoach_id (FK)\lassigned_by (FK)\l}"];
+  subgraph cluster_company {
+    label="Organization"; color="#dddddd"; style=rounded;
+    companies [label="{companies|company_id (PK)\lcompany_name\l}"];
+    users [label="{users|user_id (PK)\lcompany_id (FK)\lrole_id (FK)\lemail\lcreated_by (FK)\l}"];
+    company_coaches [label="{company_coaches|company_id (FK)\lcoach_id (FK)\lassigned_by (FK)\l}"];
+  }
 
-  batches [label="{batches|batch_id (PK)\lcompany_id (FK)\lcoach_id (FK)\lcreated_by (FK)\l}"];
-  batch_participants [label="{batch_participants|batch_id (FK)\luser_id (FK)\lenrolled_by (FK)\l}"];
+  subgraph cluster_learning {
+    label="Learning & Assessments"; color="#dddddd"; style=rounded;
+    batches [label="{batches|batch_id (PK)\lcompany_id (FK)\lcoach_id (FK)\lcreated_by (FK)\l}"];
+    batch_participants [label="{batch_participants|batch_id (FK)\luser_id (FK)\lenrolled_by (FK)\l}"];
+    assessment_tools [label="{assessment_tools|tool_id (PK)\ltool_name\l}"];
+    assessments [label="{assessments|assessment_id (PK)\luser_id (FK)\lcandidate_id (FK)\ltool_id (FK)\lbatch_id (FK)\llast_edited_by (FK)\l}"];
+    assignments [label="{assignments|assignment_id (PK)\ltool_id (FK)\l}"];
+    assignment_submissions [label="{assignment_submissions|submission_id (PK)\lassignment_id (FK)\luser_id (FK)\lbatch_id (FK)\lgraded_by (FK)\l}"];
+  }
 
-  assessment_tools [label="{assessment_tools|tool_id (PK)\ltool_name\l}"];
-  assessment_packages [label="{assessment_packages|package_id (PK)\lcompany_id (FK)\ltool_id (FK)\lpurchased_by (FK)\l}"];
-  interview_candidates [label="{interview_candidates|candidate_id (PK)\lcompany_id (FK)\lpackage_id (FK)\lconverted_to_user_id (FK)\lassigned_by (FK)\l}"];
+  subgraph cluster_content {
+    label="Content & Access"; color="#dddddd"; style=rounded;
+    resources [label="{resources|resource_id (PK)\ltool_id (FK)\lcreated_by (FK)\l}"];
+    batch_resource_access [label="{batch_resource_access|batch_id (FK)\lresource_id (FK)\lunlocked_by (FK)\l}"];
+    assessment_packages [label="{assessment_packages|package_id (PK)\lcompany_id (FK)\ltool_id (FK)\lpurchased_by (FK)\l}"];
+    interview_candidates [label="{interview_candidates|candidate_id (PK)\lcompany_id (FK)\lpackage_id (FK)\lconverted_to_user_id (FK)\lassigned_by (FK)\l}"];
+  }
 
-  assessments [label="{assessments|assessment_id (PK)\luser_id (FK)\lcandidate_id (FK)\ltool_id (FK)\lbatch_id (FK)\llast_edited_by (FK)\l}"];
+  subgraph cluster_quiz {
+    label="Quizzes"; color="#dddddd"; style=rounded;
+    quizzes [label="{quizzes|quiz_id (PK)\lcreated_by (FK)\l}"];
+    quiz_sessions [label="{quiz_sessions|session_id (PK)\lquiz_id (FK)\lstarted_by (FK)\l}"];
+    quiz_responses [label="{quiz_responses|response_id (PK)\lsession_id (FK)\l}"];
+  }
 
-  assignments [label="{assignments|assignment_id (PK)\ltool_id (FK)\l}"];
-  assignment_submissions [label="{assignment_submissions|submission_id (PK)\lassignment_id (FK)\luser_id (FK)\lbatch_id (FK)\lgraded_by (FK)\l}"];
-
-  resources [label="{resources|resource_id (PK)\ltool_id (FK)\lcreated_by (FK)\l}"];
-  batch_resource_access [label="{batch_resource_access|batch_id (FK)\lresource_id (FK)\lunlocked_by (FK)\l}"];
-
-  quizzes [label="{quizzes|quiz_id (PK)\lcreated_by (FK)\l}"];
-  quiz_sessions [label="{quiz_sessions|session_id (PK)\lquiz_id (FK)\lstarted_by (FK)\l}"];
-  quiz_responses [label="{quiz_responses|response_id (PK)\lsession_id (FK)\l}"];
-
-  system_settings [label="{system_settings|setting_id (PK)\lsetting_key (UNQ)\lupdated_by (FK)\l}"];
+  subgraph cluster_system {
+    label="System Settings"; color="#dddddd"; style=rounded;
+    system_settings [label="{system_settings|setting_id (PK)\lsetting_key (UNQ)\lupdated_by (FK)\l}"];
+  }
 
   // Relationships
   roles -> role_permissions [label="1..*", taillabel="role_id", fontsize=9];
   permissions -> role_permissions [label="1..*", taillabel="permission_id", fontsize=9];
+  roles -> users [label="assigned role", fontsize=9];
 
   companies -> users [label="1..*", taillabel="company_id", fontsize=9];
-  users -> user_roles [label="1..*", taillabel="user_id", fontsize=9];
-  roles -> user_roles [label="1..*", taillabel="role_id", fontsize=9];
-  companies -> user_roles [label="1..*", taillabel="company_id", fontsize=9];
-  users -> user_roles [label="assigned_by", style=dashed, fontsize=9];
 
   companies -> company_coaches [label="1..*", taillabel="company_id", fontsize=9];
   users -> company_coaches [label="coach_id", fontsize=9];
@@ -54,15 +65,6 @@ digraph ERD {
   batches -> batch_participants [label="1..*", taillabel="batch_id", fontsize=9];
   users -> batch_participants [label="user_id", fontsize=9];
   users -> batch_participants [label="enrolled_by", style=dashed, fontsize=9];
-
-  assessment_tools -> assessment_packages [label="1..*", taillabel="tool_id", fontsize=9];
-  companies -> assessment_packages [label="1..*", taillabel="company_id", fontsize=9];
-  users -> assessment_packages [label="purchased_by", style=dashed, fontsize=9];
-
-  assessment_packages -> interview_candidates [label="1..*", taillabel="package_id", fontsize=9];
-  companies -> interview_candidates [label="1..*", taillabel="company_id", fontsize=9];
-  users -> interview_candidates [label="assigned_by", style=dashed, fontsize=9];
-  users -> interview_candidates [label="converted_to_user_id", style=dashed, fontsize=9];
 
   assessment_tools -> assessments [label="1..*", taillabel="tool_id", fontsize=9];
   users -> assessments [label="user_id", fontsize=9];
@@ -83,10 +85,21 @@ digraph ERD {
   resources -> batch_resource_access [label="1..*", taillabel="resource_id", fontsize=9];
   users -> batch_resource_access [label="unlocked_by", style=dashed, fontsize=9];
 
+  assessment_tools -> assessment_packages [label="1..*", taillabel="tool_id", fontsize=9];
+  companies -> assessment_packages [label="1..*", taillabel="company_id", fontsize=9];
+  users -> assessment_packages [label="purchased_by", style=dashed, fontsize=9];
+  assessment_packages -> interview_candidates [label="1..*", taillabel="package_id", fontsize=9];
+  companies -> interview_candidates [label="1..*", taillabel="company_id", fontsize=9];
+  users -> interview_candidates [label="assigned_by", style=dashed, fontsize=9];
+  users -> interview_candidates [label="converted_to_user_id", style=dashed, fontsize=9];
+
   users -> quizzes [label="created_by", style=dashed, fontsize=9];
   quizzes -> quiz_sessions [label="1..*", taillabel="quiz_id", fontsize=9];
   users -> quiz_sessions [label="started_by", style=dashed, fontsize=9];
   quiz_sessions -> quiz_responses [label="1..*", taillabel="session_id", fontsize=9];
 
   users -> system_settings [label="updated_by", style=dashed, fontsize=9];
+
+  // Legend
+  legend [shape=record, fillcolor="#f6f8fa", label="{Legend|Auth & RBAC: roles, permissions, role_permissions\lOrganization: companies, users, company_coaches\lLearning & Assessments: batches, batch_participants, assessments, assignments, assignment_submissions\lContent & Access: resources, batch_resource_access, assessment_packages, interview_candidates\lQuizzes: quizzes, quiz_sessions, quiz_responses\lSystem: system_settings\lDashed edges = action/by fields (audit)\l}"];
 }
