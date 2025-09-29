@@ -1,0 +1,5 @@
+Error 408: TimeoutError: Request timeout: Timeout error: convert took more than 10000ms
+Error: Timeout error: convert took more than 10000ms
+    at Timeout._onTimeout (file:///usr/local/kroki/src/worker.js:95:64)
+    at listOnTimeout (node:internal/timers:588:17)
+    at process.processTimers (node:internal/timers:523:7)
