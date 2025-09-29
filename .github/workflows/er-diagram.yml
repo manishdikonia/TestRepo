@@ -2,6 +2,8 @@ name: Render ER Diagram
 
 on:
   push:
+    branches:
+      - main
     paths:
       - 'er/diagram.mmd'
       - '.github/workflows/er-diagram.yml'
@@ -13,16 +15,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Mermaid CLI
-        run: npm i -g @mermaid-js/mermaid-cli@10.9.0
-
-      - name: Render PNG
-        run: mmdc -i er/diagram.mmd -o er/diagram.png -w 4000 -H 3000 -b transparent
+      - name: Render PNG via Kroki
+        run: |
+          curl -fSL -X POST \
+            -H "Content-Type: text/plain" \
+            --data-binary @er/diagram.mmd \
+            https://kroki.io/mermaid/png \
+            -o er/diagram.png
 
       - name: Install ImageMagick
         run: sudo apt-get update && sudo apt-get install -y imagemagick
@@ -33,7 +32,7 @@ jobs:
       - name: Commit rendered diagrams
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "build(er): render ER diagram PNG/JPG"
+          commit_message: "build(er): render ER diagram PNG/JPG via Kroki"
           file_pattern: |
             er/diagram.png
             er/diagram.jpg
