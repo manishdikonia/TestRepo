@@ -112,6 +112,7 @@ Table companies {
 Table users {
   user_id integer [primary key]
   company_id integer [ref: > companies.company_id]
+  role_id integer [ref: > roles.role_id]
   name varchar(100) [not null]
   email varchar(100) [unique, not null]
   password_hash varchar(255)
@@ -126,19 +127,6 @@ Table users {
 
   indexes {
     (email) [unique]
-  }
-}
-
-Table user_roles {
-  user_id integer [ref: > users.user_id]
-  role_id integer [ref: > roles.role_id]
-  company_id integer [ref: > companies.company_id]
-  assigned_by integer [ref: > users.user_id]
-  assigned_at timestamp [default: `now()`]
-  is_active boolean [default: true]
-
-  indexes {
-    (user_id, role_id, company_id) [pk]
   }
 }
 
