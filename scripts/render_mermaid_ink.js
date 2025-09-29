@@ -3,8 +3,8 @@ const https = require('https');
 const zlib = require('zlib');
 const path = require('path');
 
-const inputPath = path.resolve('/workspace/er/diagram.mmd');
-const pngOut = path.resolve('/workspace/er/diagram.png');
+const inputPath = path.resolve('/workspace/er/diagram-simplified.mmd');
+const pngOut = path.resolve('/workspace/er/diagram-simplified.png');
 
 function base64url(buf) {
   return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');

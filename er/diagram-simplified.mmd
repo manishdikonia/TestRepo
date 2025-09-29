@@ -1,0 +1,36 @@
+erDiagram
+  %% Core Authentication & Users
+  roles ||--o{ users : "has"
+  companies ||--o{ users : "employs"
+  users ||--o{ company_coaches : "coaches"
+  
+  %% Learning Management
+  companies ||--o{ batches : "creates"
+  users ||--o{ batches : "coaches"
+  batches ||--o{ batch_participants : "contains"
+  users ||--o{ batch_participants : "enrolled"
+  
+  %% Assessment System
+  assessment_tools ||--o{ assessment_packages : "packaged"
+  companies ||--o{ assessment_packages : "purchases"
+  assessment_tools ||--o{ assessments : "uses"
+  users ||--o{ assessments : "takes"
+  batches ||--o{ assessments : "includes"
+  
+  %% Assignments & Content
+  assessment_tools ||--o{ assignments : "includes"
+  assignments ||--o{ assignment_submissions : "receives"
+  users ||--o{ assignment_submissions : "submits"
+  assessment_tools ||--o{ resources : "provides"
+  batches ||--o{ batch_resource_access : "unlocks"
+  resources ||--o{ batch_resource_access : "accessed"
+  
+  %% Interview Candidates
+  companies ||--o{ interview_candidates : "interviews"
+  assessment_packages ||--o{ interview_candidates : "evaluates"
+  interview_candidates ||--o{ assessments : "takes"
+  
+  %% Quiz System
+  users ||--o{ quizzes : "creates"
+  quizzes ||--o{ quiz_sessions : "runs"
+  quiz_sessions ||--o{ quiz_responses : "collects"

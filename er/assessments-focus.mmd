@@ -1,0 +1,50 @@
+erDiagram
+  %% Focus on Assessments Table Structure
+  
+  users {
+    int user_id PK
+    varchar name
+    varchar email
+  }
+
+  interview_candidates {
+    int candidate_id PK
+    varchar name
+    varchar email
+    varchar position_applied
+  }
+
+  assessment_tools {
+    int tool_id PK
+    varchar tool_name
+    text description
+  }
+
+  batches {
+    int batch_id PK
+    varchar batch_name
+  }
+
+  assessments {
+    int assessment_id PK
+    int user_id FK
+    int candidate_id FK
+    int tool_id FK
+    int batch_id FK
+    json assessment_result
+    json final_result
+    timestamp freeze_period_end
+    boolean is_result_locked
+    timestamp completed_at
+    int last_edited_by FK
+    timestamp last_edited_at
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  %% Relationships
+  users ||--o{ assessments : "takes"
+  interview_candidates ||--o{ assessments : "takes"
+  assessment_tools ||--o{ assessments : "uses"
+  batches ||--o{ assessments : "includes"
+  users ||--o{ assessments : "last_edited_by"
