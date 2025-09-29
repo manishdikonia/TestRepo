@@ -1,0 +1,314 @@
+erDiagram
+  USERS ||--o{ USER_ROLES : has
+  ROLES ||--o{ USER_ROLES : contains
+  ROLES ||--o{ ROLE_PERMISSIONS : grants
+  PERMISSIONS ||--o{ ROLE_PERMISSIONS : includes
+
+  USERS ||--o{ COMPANY_USERS : works_at
+  COMPANIES ||--o{ COMPANY_USERS : has
+
+  COMPANIES ||--o{ BATCHES : runs
+  BATCHES ||--o{ BATCH_MEMBERS : includes
+
+  USERS ||--o{ COACHES : may_be
+  USERS ||--o{ ADMINS : may_be
+
+  PARTICIPANTS }o--|| USERS : account
+  PARTICIPANTS }o--|| COMPANIES : employed_by
+
+  BATCH_MEMBERS }o--|| PARTICIPANTS : participant
+  BATCH_MEMBERS }o--|| COMPANY_USERS : staff
+
+  ASSESSMENT_TOOLS ||--o{ QUESTIONS : has
+  PARTICIPANTS ||--o{ ASSESSMENTS : takes
+  ASSESSMENT_TOOLS ||--o{ ASSESSMENTS : of_tool
+  ASSESSMENTS ||--|| ASSESSMENT_RESULTS : has
+  QUESTIONS ||--o{ PARTICIPANT_ANSWERS : answered_in
+  ASSESSMENTS ||--o{ PARTICIPANT_ANSWERS : contains
+
+  ASSESSMENTS ||--|| ASSIGNMENTS : links_to
+  PARTICIPANTS ||--o{ ASSIGNMENT_SUBMISSIONS : submits
+  ASSIGNMENTS ||--o{ ASSIGNMENT_SUBMISSIONS : receives
+
+  RESOURCES ||--o{ BATCH_RESOURCES : available_in
+  BATCHES ||--o{ BATCH_RESOURCES : uses
+  ASSESSMENT_TOOLS ||--o{ RESOURCES : related
+
+  COMPANIES ||--o{ INTERVIEW_CANDIDATES : evaluates
+  INTERVIEW_CANDIDATES ||--o{ CANDIDATE_ASSESSMENTS : takes
+  ASSESSMENT_PACKAGES ||--o{ CANDIDATE_ASSESSMENTS : allocates
+  COMPANIES ||--o{ ASSESSMENT_PACKAGES : purchases
+
+  %% Settings via freeze rules
+
+  ENTITIES ||--o{ CRM_SYNC_LOG : is_synced
+
+  %% Quiz data is live-only (non-persistent by default); modeled here for completeness
+  QUIZZES ||--o{ QUIZ_QUESTIONS : has
+  QUIZZES ||--o{ QUIZ_SESSIONS : launches
+  QUIZ_SESSIONS ||--o{ QUIZ_RESPONSES : collects
+
+  USERS {
+    bigint id PK
+    varchar email
+    varchar password_hash
+    varchar full_name
+    boolean is_active
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  ROLES {
+    smallint id PK
+    varchar name
+    varchar description
+  }
+
+  PERMISSIONS {
+    bigint id PK
+    varchar code
+    varchar description
+  }
+
+  USER_ROLES {
+    bigint id PK
+    bigint user_id FK
+    smallint role_id FK
+    bigint company_id FK "nullable, scope for company roles"
+    timestamptz assigned_at
+  }
+
+  ROLE_PERMISSIONS {
+    bigint id PK
+    smallint role_id FK
+    bigint permission_id FK
+  }
+
+  COMPANIES {
+    bigint id PK
+    varchar name
+    varchar domain "optional"
+    varchar hr_email
+    varchar phone
+    jsonb metadata
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  COMPANY_USERS {
+    bigint id PK
+    bigint company_id FK
+    bigint user_id FK
+    varchar role "HR | Manager | Other"
+    boolean is_active
+    timestamptz created_at
+  }
+
+  COACHES {
+    bigint id PK
+    bigint user_id FK
+    varchar bio
+    boolean is_active
+  }
+
+  ADMINS {
+    bigint id PK
+    bigint user_id FK
+  }
+
+  PARTICIPANTS {
+    bigint id PK
+    bigint user_id FK "nullable for interview/independent"
+    bigint company_id FK "nullable for independent coaching"
+    varchar designation
+    varchar status "active|inactive|candidate"
+    timestamptz created_at
+  }
+
+  BATCHES {
+    bigint id PK
+    bigint company_id FK
+    varchar name
+    date start_date
+    date end_date
+    integer max_size
+    bigint coach_id FK
+    timestamptz created_at
+  }
+
+  BATCH_MEMBERS {
+    bigint id PK
+    bigint batch_id FK
+    varchar member_type "participant|company_user"
+    bigint participant_id FK
+    bigint company_user_id FK
+    timestamptz added_at
+  }
+
+  ASSESSMENT_TOOLS {
+    bigint id PK
+    varchar code
+    varchar name
+    varchar version
+    boolean is_active
+    jsonb config "scoring params"
+  }
+
+  QUESTIONS {
+    bigint id PK
+    bigint tool_id FK
+    integer sequence
+    varchar type "mcq|scale|text"
+    text prompt
+    jsonb options
+    jsonb metadata
+  }
+
+  ASSESSMENTS {
+    bigint id PK
+    bigint participant_id FK
+    bigint tool_id FK
+    bigint assigned_by_user_id FK
+    timestamptz assigned_at
+    varchar status "assigned|in_progress|submitted"
+    timestamptz submitted_at
+  }
+
+  PARTICIPANT_ANSWERS {
+    bigint id PK
+    bigint assessment_id FK
+    bigint question_id FK
+    jsonb answer
+    timestamptz answered_at
+  }
+
+  ASSESSMENT_RESULTS {
+    bigint id PK
+    bigint assessment_id FK
+    jsonb auto_result
+    jsonb final_result
+    timestamptz final_result_locked_at
+    timestamptz calculated_at
+  }
+
+  FREEZE_RULES {
+    bigint id PK
+    integer freeze_days "default 30"
+    varchar scope "global|company|batch|participant|tool"
+    bigint scope_id "nullable"
+    boolean allow_coach_override
+  }
+
+  ASSIGNMENTS {
+    bigint id PK
+    bigint assessment_id FK "one assignment per assessment"
+    text title
+    text instructions
+    timestamptz due_at
+  }
+
+  ASSIGNMENT_SUBMISSIONS {
+    bigint id PK
+    bigint assignment_id FK
+    bigint participant_id FK
+    varchar status "draft|submitted|graded"
+    text notes
+    text file_url
+    timestamptz submitted_at
+  }
+
+  RESOURCES {
+    bigint id PK
+    bigint tool_id FK "nullable"
+    varchar title
+    varchar type "pdf|ppt|doc|link"
+    text url
+    varchar security_level "view_only|watermarked"
+    boolean visible_to_participants
+    boolean visible_to_management
+  }
+
+  BATCH_RESOURCES {
+    bigint id PK
+    bigint batch_id FK
+    bigint resource_id FK
+    timestamptz unlocked_at
+    bigint unlocked_by_user_id FK
+  }
+
+  INTERVIEW_CANDIDATES {
+    bigint id PK
+    bigint company_id FK
+    varchar full_name
+    varchar email
+    varchar phone
+    varchar status "invited|submitted|hired|rejected"
+    timestamptz created_at
+  }
+
+  ASSESSMENT_PACKAGES {
+    bigint id PK
+    bigint company_id FK
+    bigint tool_id FK
+    integer quota
+    integer used_count
+    timestamptz purchased_at
+    timestamptz expires_at
+  }
+
+  CANDIDATE_ASSESSMENTS {
+    bigint id PK
+    bigint candidate_id FK
+    bigint tool_id FK
+    bigint package_id FK
+    varchar status "assigned|submitted"
+    timestamptz submitted_at
+  }
+
+  QUIZZES {
+    bigint id PK
+    varchar title
+    text description
+  }
+
+  QUIZ_QUESTIONS {
+    bigint id PK
+    bigint quiz_id FK
+    integer sequence
+    text prompt
+    jsonb options
+  }
+
+  QUIZ_SESSIONS {
+    bigint id PK
+    bigint quiz_id FK
+    bigint launched_by_coach_id FK
+    bigint batch_id FK
+    timestamptz started_at
+    timestamptz ended_at
+  }
+
+  QUIZ_RESPONSES {
+    bigint id PK
+    bigint quiz_session_id FK
+    varchar participant_name
+    varchar participant_email
+    jsonb response
+    timestamptz answered_at
+  }
+
+  ENTITIES {
+    bigint id PK
+    varchar entity_type "participant|assessment|assignment|candidate"
+  }
+
+  CRM_SYNC_LOG {
+    bigint id PK
+    varchar entity_type
+    bigint entity_id
+    jsonb payload
+    varchar status "pending|success|failed"
+    text error_message
+    timestamptz synced_at
+  }
+
