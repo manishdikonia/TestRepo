@@ -1,0 +1,310 @@
+### ER Diagram
+
+Below is the ER diagram rendered directly by GitHub using Mermaid. The source is in `er/diagram.mmd`. A generated image will also be available at `er/diagram.png`.
+
+```mermaid
+erDiagram
+  roles {
+    int role_id PK
+    varchar role_name
+    text description
+    boolean is_system_role
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  permissions {
+    int permission_id PK
+    varchar permission_name
+    text description
+    varchar resource
+    varchar action
+    timestamp created_at
+  }
+
+  role_permissions {
+    int role_id FK
+    int permission_id FK
+    timestamp assigned_at
+  }
+
+  companies {
+    int company_id PK
+    varchar company_name
+    varchar contact_person
+    varchar contact_email
+    varchar contact_phone
+    text address
+    date contract_start_date
+    date contract_end_date
+    int max_batch_size
+    int max_employees
+    enum subscription_status
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  users {
+    int user_id PK
+    int company_id FK
+    varchar name
+    varchar email
+    varchar password_hash
+    varchar phone
+    varchar designation
+    enum company_role
+    boolean is_active
+    timestamp last_login
+    int created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  user_roles {
+    int user_id FK
+    int role_id FK
+    int company_id FK
+    int assigned_by FK
+    timestamp assigned_at
+    boolean is_active
+  }
+
+  company_coaches {
+    int company_id FK
+    int coach_id FK
+    timestamp assigned_at
+    int assigned_by FK
+    boolean is_active
+  }
+
+  batches {
+    int batch_id PK
+    int company_id FK
+    varchar batch_name
+    int coach_id FK
+    int max_participants
+    int current_participants
+    date start_date
+    date end_date
+    enum status
+    int created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  batch_participants {
+    int batch_id FK
+    int user_id FK
+    timestamp enrolled_at
+    int enrolled_by FK
+    enum status
+  }
+
+  assessment_tools {
+    int tool_id PK
+    varchar tool_name
+    text description
+    varchar algorithm_version
+    int question_count
+    int time_limit_minutes
+    boolean is_active
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  assessment_packages {
+    int package_id PK
+    int company_id FK
+    varchar package_name
+    int tool_id FK
+    int total_assessments
+    int used_assessments
+    int remaining_assessments
+    date purchase_date
+    date expiry_date
+    enum package_type
+    int purchased_by FK
+    timestamp created_at
+  }
+
+  interview_candidates {
+    int candidate_id PK
+    int company_id FK
+    int package_id FK
+    varchar name
+    varchar email
+    varchar phone
+    varchar position_applied
+    varchar assessment_link
+    enum status
+    int converted_to_user_id FK
+    int assigned_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  assessments {
+    int assessment_id PK
+    int user_id FK
+    int candidate_id FK
+    int tool_id FK
+    int batch_id FK
+    json assessment_result
+    json final_result
+    timestamp freeze_period_end
+    boolean is_result_locked
+    timestamp completed_at
+    int last_edited_by FK
+    timestamp last_edited_at
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  assignments {
+    int assignment_id PK
+    int tool_id FK
+    varchar assignment_name
+    text description
+    text instructions
+    enum submission_format
+    int max_file_size_mb
+    int due_date_offset_days
+    boolean is_mandatory
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  assignment_submissions {
+    int submission_id PK
+    int assignment_id FK
+    int user_id FK
+    int batch_id FK
+    varchar submission_file_path
+    text submission_text
+    timestamp submitted_at
+    int graded_by FK
+    varchar grade
+    text feedback
+    timestamp graded_at
+  }
+
+  resources {
+    int resource_id PK
+    int tool_id FK
+    varchar resource_name
+    text description
+    varchar file_path
+    enum file_type
+    decimal file_size_mb
+    enum access_level
+    boolean is_downloadable
+    boolean watermark_required
+    int created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  batch_resource_access {
+    int batch_id FK
+    int resource_id FK
+    int unlocked_by FK
+    timestamp unlocked_at
+    timestamp access_expires_at
+  }
+
+  quizzes {
+    int quiz_id PK
+    varchar quiz_name
+    text description
+    int question_count
+    int time_limit_minutes
+    boolean is_active
+    int created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  quiz_sessions {
+    int session_id PK
+    int quiz_id FK
+    varchar session_name
+    varchar access_code
+    varchar qr_code_path
+    int started_by FK
+    timestamp started_at
+    timestamp ended_at
+    enum status
+  }
+
+  quiz_responses {
+    int response_id PK
+    int session_id FK
+    varchar participant_name
+    varchar participant_email
+    json responses
+    int score
+    timestamp completed_at
+    int rank
+  }
+
+  system_settings {
+    int setting_id PK
+    varchar setting_key
+    text setting_value
+    text description
+    enum data_type
+    int updated_by FK
+    timestamp updated_at
+  }
+
+  roles ||--o{ role_permissions : assigns
+  permissions ||--o{ role_permissions : grants
+
+  companies ||--o{ users : employs
+  users ||--o{ user_roles : has
+  roles ||--o{ user_roles : maps
+  companies ||--o{ user_roles : context
+
+  companies ||--o{ company_coaches : has
+  users ||--o{ company_coaches : coaches
+
+  companies ||--o{ batches : owns
+  users ||--o{ batches : coaches
+  users ||--o{ batches : creates
+
+  batches ||--o{ batch_participants : has
+  users ||--o{ batch_participants : enrolled
+
+  assessment_tools ||--o{ assessment_packages : uses
+  companies ||--o{ assessment_packages : purchases
+  users ||--o{ assessment_packages : purchases_by
+
+  assessment_packages ||--o{ interview_candidates : includes
+  companies ||--o{ interview_candidates : sources
+  users ||--o{ interview_candidates : assigns
+  users ||--o{ interview_candidates : converts
+
+  assessment_tools ||--o{ assessments : evaluated_with
+  users ||--o{ assessments : takes
+  interview_candidates ||--o{ assessments : candidate_of
+  batches ||--o{ assessments : in
+  users ||--o{ assessments : edited_by
+
+  assessment_tools ||--o{ assignments : includes
+  assignments ||--o{ assignment_submissions : has
+  users ||--o{ assignment_submissions : submits
+  batches ||--o{ assignment_submissions : context
+  users ||--o{ assignment_submissions : grades
+
+  assessment_tools ||--o{ resources : provides
+  users ||--o{ resources : uploads
+
+  batches ||--o{ batch_resource_access : unlocks
+  resources ||--o{ batch_resource_access : granted
+  users ||--o{ batch_resource_access : by
+
+  users ||--o{ quizzes : creates
+  quizzes ||--o{ quiz_sessions : has
+  users ||--o{ quiz_sessions : starts
+  quiz_sessions ||--o{ quiz_responses : records
+```
