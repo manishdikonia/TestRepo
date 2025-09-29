@@ -1,3 +1,40 @@
+## Training & Assessment Management Platform - ERD and Schema
+
+Files:
+
+- `docs/er/er_diagram.mmd` — Mermaid ER diagram source.
+- `sql/schema.sql` — PostgreSQL schema matching the diagram.
+
+### Render the ER diagram to JPG
+
+Option A: Using Node Mermaid CLI (recommended)
+
+```bash
+npm install -g @mermaid-js/mermaid-cli
+mmdc -i docs/er/er_diagram.mmd -o docs/er/er_diagram.jpg -b transparent --scale 1.2
+```
+
+Option B: Using Docker (no Node required)
+
+```bash
+docker run --rm -v "$(pwd)":/data minlag/mermaid-cli mmdc \
+  -i /data/docs/er/er_diagram.mmd -o /data/docs/er/er_diagram.jpg -b transparent --scale 1.2
+```
+
+### Role & Permission Matrix (starter)
+
+| Role | Key permissions |
+|------|------------------|
+| participant | `assessment:view`, `resource:view`, submit `assignment` |
+| company | `batch:manage`, `assessment:view`, `reports:view` |
+| coach | `assignment:unlock`, `assessment:edit_final`, `resource:upload`, `quiz:launch`, `reports:view` |
+| admin | `company:manage`, `tools:manage`, all above |
+
+Notes:
+
+- Freeze rules are configurable in `freeze_rules`. Once `final_result_locked_at` is set on `assessment_results`, only company/coach with permission `assessment:edit_final` can update.
+- Quizzes are modeled (`quizzes`, `quiz_sessions`, `quiz_responses`) but may be configured as in-memory/live only if you choose not to persist.
+
 ### ER Diagram
 
 Below is the ER diagram rendered directly by GitHub using Mermaid. The source is in `er/diagram.mmd`. A generated image will also be available at `er/diagram.png`.
