@@ -41,7 +41,7 @@ assessment_packages {
 
 ### 5. **Role-Based Access Gaps** ⚠️
 **Problem:** RBAC system exists but might be incomplete:
-- No **company-specific roles** (roles seem global)
+- ✅ **Global roles confirmed** (per client requirement)
 - No **resource-level permissions**
 - Missing **batch-level access controls**
 
@@ -92,7 +92,10 @@ assessment_packages {
 5. **Progress Tracking:** What level of learning progress detail is needed?
 6. **Notifications:** Is an integrated notification system required?
 
-## 📊 **Accuracy Rating: 7/10**
+## ✅ **Client Confirmations**
+- **Global Roles & Permissions:** ✅ Confirmed - roles and permissions are global, not company-specific
+
+## 📊 **Accuracy Rating: 7.5/10**
 
 **Strengths:** Good foundation, proper relationships, multi-tenant design
 **Weaknesses:** Some business logic flaws, missing workflow components
