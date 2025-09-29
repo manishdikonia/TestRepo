@@ -24,8 +24,16 @@ jobs:
       - name: Render PNG
         run: mmdc -i er/diagram.mmd -o er/diagram.png -w 4000 -H 3000 -b transparent
 
-      - name: Commit rendered diagram
+      - name: Install ImageMagick
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+
+      - name: Convert PNG to JPG
+        run: convert er/diagram.png -background white -alpha remove -alpha off -quality 92 er/diagram.jpg
+
+      - name: Commit rendered diagrams
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "build(er): render ER diagram PNG"
-          file_pattern: er/diagram.png
+          commit_message: "build(er): render ER diagram PNG/JPG"
+          file_pattern: |
+            er/diagram.png
+            er/diagram.jpg
