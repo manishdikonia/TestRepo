@@ -1,4 +1,8 @@
 erDiagram
+  %% =============================================================================
+  %% AUTHENTICATION & RBAC (Role-Based Access Control)
+  %% =============================================================================
+  
   roles {
     int role_id PK
     varchar role_name
@@ -22,6 +26,10 @@ erDiagram
     int permission_id FK
     timestamp assigned_at
   }
+
+  %% =============================================================================
+  %% ORGANIZATION MANAGEMENT
+  %% =============================================================================
 
   companies {
     int company_id PK
@@ -63,6 +71,10 @@ erDiagram
     int assigned_by FK
     boolean is_active
   }
+
+  %% =============================================================================
+  %% LEARNING & ASSESSMENTS
+  %% =============================================================================
 
   batches {
     int batch_id PK
@@ -114,22 +126,6 @@ erDiagram
     timestamp created_at
   }
 
-  interview_candidates {
-    int candidate_id PK
-    int company_id FK
-    int package_id FK
-    varchar name
-    varchar email
-    varchar phone
-    varchar position_applied
-    varchar assessment_link
-    enum status
-    int converted_to_user_id FK
-    int assigned_by FK
-    timestamp created_at
-    timestamp updated_at
-  }
-
   assessments {
     int assessment_id PK
     int user_id FK
@@ -175,6 +171,10 @@ erDiagram
     timestamp graded_at
   }
 
+  %% =============================================================================
+  %% CONTENT & ACCESS
+  %% =============================================================================
+
   resources {
     int resource_id PK
     int tool_id FK
@@ -198,6 +198,30 @@ erDiagram
     timestamp unlocked_at
     timestamp access_expires_at
   }
+
+  %% =============================================================================
+  %% INTERVIEW CANDIDATES
+  %% =============================================================================
+
+  interview_candidates {
+    int candidate_id PK
+    int company_id FK
+    int package_id FK
+    varchar name
+    varchar email
+    varchar phone
+    varchar position_applied
+    varchar assessment_link
+    enum status
+    int converted_to_user_id FK
+    int assigned_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  %% =============================================================================
+  %% QUIZZES
+  %% =============================================================================
 
   quizzes {
     int quiz_id PK
@@ -234,6 +258,10 @@ erDiagram
     int rank
   }
 
+  %% =============================================================================
+  %% SYSTEM SETTINGS
+  %% =============================================================================
+
   system_settings {
     int setting_id PK
     varchar setting_key
@@ -244,51 +272,79 @@ erDiagram
     timestamp updated_at
   }
 
-  roles ||--o{ role_permissions : assigns
-  permissions ||--o{ role_permissions : grants
+  %% =============================================================================
+  %% RELATIONSHIPS - RBAC
+  %% =============================================================================
+  
+  roles ||--o{ role_permissions : "has"
+  permissions ||--o{ role_permissions : "granted_to"
+  roles ||--o{ users : "assigned_to"
 
-  roles ||--o{ users : assigned
-  companies ||--o{ users : employs
+  %% =============================================================================
+  %% RELATIONSHIPS - ORGANIZATION
+  %% =============================================================================
+  
+  companies ||--o{ users : "employs"
+  companies ||--o{ company_coaches : "has_coaches"
+  users ||--o{ company_coaches : "coaches_for"
+  users ||--o{ users : "created_by"
 
-  companies ||--o{ company_coaches : has
-  users ||--o{ company_coaches : coaches
+  %% =============================================================================
+  %% RELATIONSHIPS - LEARNING & ASSESSMENTS
+  %% =============================================================================
+  
+  companies ||--o{ batches : "owns"
+  users ||--o{ batches : "coaches"
+  users ||--o{ batches : "creates"
+  batches ||--o{ batch_participants : "has_participants"
+  users ||--o{ batch_participants : "enrolled_in"
+  
+  assessment_tools ||--o{ assessment_packages : "used_in"
+  companies ||--o{ assessment_packages : "purchases"
+  users ||--o{ assessment_packages : "purchased_by"
+  
+  assessment_tools ||--o{ assessments : "evaluated_with"
+  users ||--o{ assessments : "takes"
+  batches ||--o{ assessments : "includes"
+  users ||--o{ assessments : "last_edited_by"
+  
+  assessment_tools ||--o{ assignments : "includes"
+  assignments ||--o{ assignment_submissions : "has_submissions"
+  users ||--o{ assignment_submissions : "submits"
+  batches ||--o{ assignment_submissions : "context"
+  users ||--o{ assignment_submissions : "grades"
 
-  companies ||--o{ batches : owns
-  users ||--o{ batches : coaches
-  users ||--o{ batches : creates
+  %% =============================================================================
+  %% RELATIONSHIPS - CONTENT & ACCESS
+  %% =============================================================================
+  
+  assessment_tools ||--o{ resources : "provides"
+  users ||--o{ resources : "uploads"
+  batches ||--o{ batch_resource_access : "unlocks"
+  resources ||--o{ batch_resource_access : "accessed_through"
+  users ||--o{ batch_resource_access : "unlocked_by"
 
-  batches ||--o{ batch_participants : has
-  users ||--o{ batch_participants : enrolled
+  %% =============================================================================
+  %% RELATIONSHIPS - CANDIDATES
+  %% =============================================================================
+  
+  companies ||--o{ interview_candidates : "sources"
+  assessment_packages ||--o{ interview_candidates : "includes"
+  users ||--o{ interview_candidates : "assigns"
+  users ||--o{ interview_candidates : "converts_to"
+  interview_candidates ||--o{ assessments : "takes"
 
-  assessment_tools ||--o{ assessment_packages : uses
-  companies ||--o{ assessment_packages : purchases
-  users ||--o{ assessment_packages : purchases_by
+  %% =============================================================================
+  %% RELATIONSHIPS - QUIZZES
+  %% =============================================================================
+  
+  users ||--o{ quizzes : "creates"
+  quizzes ||--o{ quiz_sessions : "has_sessions"
+  users ||--o{ quiz_sessions : "starts"
+  quiz_sessions ||--o{ quiz_responses : "records"
 
-  assessment_packages ||--o{ interview_candidates : includes
-  companies ||--o{ interview_candidates : sources
-  users ||--o{ interview_candidates : assigns
-  users ||--o{ interview_candidates : converts
-
-  assessment_tools ||--o{ assessments : evaluated_with
-  users ||--o{ assessments : takes
-  interview_candidates ||--o{ assessments : candidate_of
-  batches ||--o{ assessments : in
-  users ||--o{ assessments : edited_by
-
-  assessment_tools ||--o{ assignments : includes
-  assignments ||--o{ assignment_submissions : has
-  users ||--o{ assignment_submissions : submits
-  batches ||--o{ assignment_submissions : context
-  users ||--o{ assignment_submissions : grades
-
-  assessment_tools ||--o{ resources : provides
-  users ||--o{ resources : uploads
-
-  batches ||--o{ batch_resource_access : unlocks
-  resources ||--o{ batch_resource_access : granted
-  users ||--o{ batch_resource_access : by
-
-  users ||--o{ quizzes : creates
-  quizzes ||--o{ quiz_sessions : has
-  users ||--o{ quiz_sessions : starts
-  quiz_sessions ||--o{ quiz_responses : records
+  %% =============================================================================
+  %% RELATIONSHIPS - SYSTEM
+  %% =============================================================================
+  
+  users ||--o{ system_settings : "updates"
