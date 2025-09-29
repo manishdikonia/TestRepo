@@ -1,0 +1,490 @@
+
+digraph ERD {
+    // Graph settings for better layout
+    graph [
+        rankdir=TB
+        bgcolor="white"
+        fontname="Arial"
+        fontsize=24
+        label="Training & Assessment Management Platform\nEntity Relationship Diagram"
+        labelloc=t
+        pad=0.5
+        nodesep=0.7
+        ranksep=1.0
+        splines=ortho
+    ];
+    
+    node [
+        shape=none
+        fontname="Arial"
+        fontsize=10
+    ];
+    
+    edge [
+        fontname="Arial"
+        fontsize=9
+        arrowhead=crow
+        arrowtail=crow
+    ];
+    
+    // ==========================================
+    // USER MANAGEMENT SECTION
+    // ==========================================
+    
+    subgraph cluster_user_mgmt {
+        label="USER MANAGEMENT"
+        style=filled
+        fillcolor="#E3F2FD"
+        color="#1976D2"
+        
+        USERS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#1976D2" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>USERS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>user_id</B></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">email (unique)</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">password_hash</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">first_name</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">last_name</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">role_type</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">is_active</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">created_at</TD></TR>
+            </TABLE>
+        >];
+        
+        PARTICIPANTS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#1976D2" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>PARTICIPANTS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>participant_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>user_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>company_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>batch_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">designation</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">department</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">employee_id</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">profile_type</TD></TR>
+            </TABLE>
+        >];
+        
+        COACHES [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#1976D2" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>COACHES</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>coach_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>user_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">specialization</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">certification</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">experience_years</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">bio</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">is_available</TD></TR>
+            </TABLE>
+        >];
+        
+        COMPANIES [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#1976D2" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>COMPANIES</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>company_id</B></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">company_name</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">industry</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">hr_contact_email</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">hr_contact_phone</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">address</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">contract_details</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">max_employees</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">is_active</TD></TR>
+            </TABLE>
+        >];
+        
+        ADMINS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#1976D2" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>ADMINS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>admin_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>user_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">admin_level</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">permissions</TD></TR>
+            </TABLE>
+        >];
+    }
+    
+    // ==========================================
+    // BATCH MANAGEMENT SECTION
+    // ==========================================
+    
+    subgraph cluster_batch {
+        label="BATCH MANAGEMENT"
+        style=filled
+        fillcolor="#E8F5E9"
+        color="#388E3C"
+        
+        BATCHES [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#388E3C" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>BATCHES</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>batch_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>company_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>coach_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">batch_name</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">batch_code</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">max_size</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">current_size</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">start_date</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">end_date</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">status</TD></TR>
+            </TABLE>
+        >];
+        
+        BATCH_PARTICIPANTS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#388E3C" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>BATCH_PARTICIPANTS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>batch_participant_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>batch_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>participant_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">enrolled_date</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">completion_status</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">progress_percentage</TD></TR>
+            </TABLE>
+        >];
+    }
+    
+    // ==========================================
+    // ASSESSMENT CORE SECTION
+    // ==========================================
+    
+    subgraph cluster_assessment {
+        label="ASSESSMENT SYSTEM"
+        style=filled
+        fillcolor="#FFF3E0"
+        color="#F57C00"
+        
+        ASSESSMENT_TOOLS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#F57C00" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>ASSESSMENT_TOOLS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>tool_id</B></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">tool_name</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">tool_code</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">description</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">question_count</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">duration_minutes</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">scoring_algorithm</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">is_active</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">version</TD></TR>
+            </TABLE>
+        >];
+        
+        ASSESSMENTS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#F57C00" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>ASSESSMENTS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>assessment_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>participant_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>tool_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>batch_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">assessment_type</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">status</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">started_at</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">completed_at</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">validity_period</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">attempt_number</TD></TR>
+            </TABLE>
+        >];
+        
+        ASSESSMENT_RESULTS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#F57C00" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>ASSESSMENT_RESULTS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>result_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>assessment_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">raw_score</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT"><B>calculated_result</B></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT"><B>final_result</B></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">is_frozen</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">freeze_date</TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>last_edited_by</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">edit_reason</TD></TR>
+            </TABLE>
+        >];
+        
+        QUESTIONS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#F57C00" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>QUESTIONS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>question_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>tool_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">question_text</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">question_type</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">options_json</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">correct_answer</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">weight</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">sequence_order</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">is_mandatory</TD></TR>
+            </TABLE>
+        >];
+        
+        PARTICIPANT_ANSWERS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#F57C00" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>PARTICIPANT_ANSWERS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>answer_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>assessment_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>question_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">answer_value</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">answer_text</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">time_spent_seconds</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">submitted_at</TD></TR>
+            </TABLE>
+        >];
+    }
+    
+    // ==========================================
+    // ASSIGNMENTS & RESOURCES SECTION
+    // ==========================================
+    
+    subgraph cluster_resources {
+        label="ASSIGNMENTS & RESOURCES"
+        style=filled
+        fillcolor="#F3E5F5"
+        color="#7B1FA2"
+        
+        ASSIGNMENTS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#7B1FA2" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>ASSIGNMENTS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>assignment_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>tool_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">title</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">description</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">instructions</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">due_days</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">max_score</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">is_mandatory</TD></TR>
+            </TABLE>
+        >];
+        
+        ASSIGNMENT_SUBMISSIONS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#7B1FA2" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>ASSIGNMENT_SUBMISSIONS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>submission_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>assignment_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>participant_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>assessment_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">submission_text</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">file_path</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">submitted_at</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">score</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">feedback</TD></TR>
+            </TABLE>
+        >];
+        
+        RESOURCES [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#7B1FA2" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>RESOURCES</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>resource_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>tool_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">resource_name</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">resource_type</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">file_path</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">url</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">access_level</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">is_downloadable</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">sequence_order</TD></TR>
+            </TABLE>
+        >];
+        
+        BATCH_RESOURCES [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#7B1FA2" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>BATCH_RESOURCES</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>batch_resource_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>batch_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>resource_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>coach_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">unlocked_at</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">locked_at</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">access_type</TD></TR>
+            </TABLE>
+        >];
+    }
+    
+    // ==========================================
+    // INTERVIEW MANAGEMENT SECTION
+    // ==========================================
+    
+    subgraph cluster_interview {
+        label="INTERVIEW MANAGEMENT"
+        style=filled
+        fillcolor="#FFEBEE"
+        color="#C62828"
+        
+        INTERVIEW_CANDIDATES [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#C62828" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>INTERVIEW_CANDIDATES</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>candidate_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>company_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">email</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">full_name</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">phone</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">position_applied</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">assessment_link</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">link_expiry</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">status</TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>converted_to_participant</I></FONT></TD></TR>
+            </TABLE>
+        >];
+        
+        ASSESSMENT_PACKAGES [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#C62828" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>ASSESSMENT_PACKAGES</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>package_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>company_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">package_name</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">tool_quotas_json</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">purchased_date</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">expiry_date</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">total_assessments</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">used_assessments</TD></TR>
+            </TABLE>
+        >];
+    }
+    
+    // ==========================================
+    // QUIZ SYSTEM SECTION
+    // ==========================================
+    
+    subgraph cluster_quiz {
+        label="QUIZ SYSTEM"
+        style=filled
+        fillcolor="#E0F2F1"
+        color="#00695C"
+        
+        QUIZZES [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#00695C" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>QUIZZES</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>quiz_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>coach_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">quiz_name</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">quiz_code</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">questions_json</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">duration_minutes</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">is_live</TD></TR>
+            </TABLE>
+        >];
+        
+        QUIZ_SESSIONS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#00695C" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>QUIZ_SESSIONS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>session_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>quiz_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>batch_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">access_code</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">qr_code</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">started_at</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">ended_at</TD></TR>
+            </TABLE>
+        >];
+        
+        QUIZ_RESPONSES [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#00695C" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>QUIZ_RESPONSES</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>response_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>session_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">participant_name</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">participant_email</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">responses_json</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">score</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">submitted_at</TD></TR>
+            </TABLE>
+        >];
+    }
+    
+    // ==========================================
+    // SUPPORTING TABLES SECTION
+    // ==========================================
+    
+    subgraph cluster_support {
+        label="SUPPORTING TABLES"
+        style=filled
+        fillcolor="#F5F5F5"
+        color="#616161"
+        
+        COACH_COMPANIES [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#616161" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>COACH_COMPANIES</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>coach_company_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>coach_id</I></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>company_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">assigned_date</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">is_active</TD></TR>
+            </TABLE>
+        >];
+        
+        CRM_SYNC_LOG [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#616161" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>CRM_SYNC_LOG</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>sync_id</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>participant_id</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">sync_type</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">sync_data_json</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">sync_status</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">error_message</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">synced_at</TD></TR>
+            </TABLE>
+        >];
+        
+        SYSTEM_SETTINGS [label=<
+            <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="white">
+                <TR><TD BGCOLOR="#616161" ALIGN="CENTER" COLSPAN="2"><FONT COLOR="white"><B>SYSTEM_SETTINGS</B></FONT></TD></TR>
+                <TR><TD ALIGN="LEFT">PK</TD><TD ALIGN="LEFT"><FONT COLOR="#D32F2F"><B>setting_id</B></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">setting_key</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">setting_value</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">setting_type</TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">description</TD></TR>
+                <TR><TD ALIGN="LEFT">FK</TD><TD ALIGN="LEFT"><FONT COLOR="#1976D2"><I>updated_by</I></FONT></TD></TR>
+                <TR><TD></TD><TD ALIGN="LEFT">updated_at</TD></TR>
+            </TABLE>
+        >];
+    }
+    
+    // ==========================================
+    // RELATIONSHIPS
+    // ==========================================
+    
+    // User relationships
+    USERS -> PARTICIPANTS [label="1:1" dir=both arrowtail=none arrowhead=none];
+    USERS -> COACHES [label="1:1" dir=both arrowtail=none arrowhead=none];
+    USERS -> ADMINS [label="1:1" dir=both arrowtail=none arrowhead=none];
+    
+    // Company relationships
+    COMPANIES -> PARTICIPANTS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    COMPANIES -> BATCHES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    COMPANIES -> INTERVIEW_CANDIDATES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    COMPANIES -> ASSESSMENT_PACKAGES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    
+    // Batch relationships
+    COACHES -> BATCHES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    BATCHES -> BATCH_PARTICIPANTS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    PARTICIPANTS -> BATCH_PARTICIPANTS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    BATCHES -> QUIZ_SESSIONS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    BATCHES -> BATCH_RESOURCES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    
+    // Assessment relationships
+    ASSESSMENT_TOOLS -> ASSESSMENTS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    ASSESSMENT_TOOLS -> QUESTIONS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    ASSESSMENT_TOOLS -> ASSIGNMENTS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    ASSESSMENT_TOOLS -> RESOURCES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    
+    PARTICIPANTS -> ASSESSMENTS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    ASSESSMENTS -> ASSESSMENT_RESULTS [label="1:1" dir=both arrowtail=none arrowhead=none];
+    ASSESSMENTS -> PARTICIPANT_ANSWERS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    QUESTIONS -> PARTICIPANT_ANSWERS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    
+    // Assignment relationships
+    ASSIGNMENTS -> ASSIGNMENT_SUBMISSIONS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    PARTICIPANTS -> ASSIGNMENT_SUBMISSIONS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    ASSESSMENTS -> ASSIGNMENT_SUBMISSIONS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    
+    // Resource relationships
+    RESOURCES -> BATCH_RESOURCES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    COACHES -> BATCH_RESOURCES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    
+    // Quiz relationships
+    COACHES -> QUIZZES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    QUIZZES -> QUIZ_SESSIONS [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    QUIZ_SESSIONS -> QUIZ_RESPONSES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    
+    // Supporting relationships
+    COACHES -> COACH_COMPANIES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    COMPANIES -> COACH_COMPANIES [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    PARTICIPANTS -> CRM_SYNC_LOG [label="1:N" dir=both arrowtail=none arrowhead=crow];
+    INTERVIEW_CANDIDATES -> PARTICIPANTS [label="0:1" dir=both arrowtail=odot arrowhead=none style=dashed];
+}
