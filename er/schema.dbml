@@ -1,0 +1,347 @@
+Enum subscription_status {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+Enum company_role {
+  ADMIN
+  HR
+  EMPLOYEE
+}
+
+Enum batch_status {
+  ACTIVE
+  COMPLETED
+  SUSPENDED
+}
+
+Enum participant_status {
+  ACTIVE
+  COMPLETED
+  DROPPED
+}
+
+Enum package_type {
+  EMPLOYEE
+  INTERVIEW_CANDIDATE
+}
+
+Enum candidate_status {
+  PENDING
+  COMPLETED
+  HIRED
+  REJECTED
+}
+
+Enum submission_format {
+  PDF
+  DOC
+  TEXT
+}
+
+Enum resource_file_type {
+  PDF
+  PPT
+  DOC
+  VIDEO
+}
+
+Enum access_level {
+  PARTICIPANT
+  MANAGEMENT
+  COACH
+}
+
+Enum quiz_session_status {
+  ACTIVE
+  COMPLETED
+}
+
+Enum system_setting_data_type {
+  INTEGER
+  STRING
+  BOOLEAN
+  JSON
+}
+
+Table roles {
+  role_id integer [primary key]
+  role_name varchar(50) [not null]
+  description text
+  is_system_role boolean [default: false]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table permissions {
+  permission_id integer [primary key]
+  permission_name varchar(100) [not null]
+  description text
+  resource varchar(50)
+  action varchar(20)
+  created_at timestamp [default: `now()`]
+}
+
+Table role_permissions {
+  role_id integer [ref: > roles.role_id]
+  permission_id integer [ref: > permissions.permission_id]
+  assigned_at timestamp [default: `now()`]
+
+  indexes {
+    (role_id, permission_id) [pk]
+  }
+}
+
+Table companies {
+  company_id integer [primary key]
+  company_name varchar(200) [not null]
+  contact_person varchar(100)
+  contact_email varchar(100)
+  contact_phone varchar(20)
+  address text
+  contract_start_date date
+  contract_end_date date
+  max_batch_size integer [default: 50]
+  max_employees integer [default: 1000]
+  subscription_status subscription_status [default: 'ACTIVE']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table users {
+  user_id integer [primary key]
+  company_id integer [ref: > companies.company_id]
+  name varchar(100) [not null]
+  email varchar(100) [unique, not null]
+  password_hash varchar(255)
+  phone varchar(20)
+  designation varchar(100)
+  company_role company_role
+  is_active boolean [default: true]
+  last_login timestamp
+  created_by integer [ref: > users.user_id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (email) [unique]
+  }
+}
+
+Table user_roles {
+  user_id integer [ref: > users.user_id]
+  role_id integer [ref: > roles.role_id]
+  company_id integer [ref: > companies.company_id]
+  assigned_by integer [ref: > users.user_id]
+  assigned_at timestamp [default: `now()`]
+  is_active boolean [default: true]
+
+  indexes {
+    (user_id, role_id, company_id) [pk]
+  }
+}
+
+Table company_coaches {
+  company_id integer [ref: > companies.company_id]
+  coach_id integer [ref: > users.user_id]
+  assigned_at timestamp [default: `now()`]
+  assigned_by integer [ref: > users.user_id]
+  is_active boolean [default: true]
+
+  indexes {
+    (company_id, coach_id) [pk]
+  }
+}
+
+Table batches {
+  batch_id integer [primary key]
+  company_id integer [ref: > companies.company_id]
+  batch_name varchar(100) [not null]
+  coach_id integer [ref: > users.user_id]
+  max_participants integer [default: 50]
+  current_participants integer [default: 0]
+  start_date date
+  end_date date
+  status batch_status [default: 'ACTIVE']
+  created_by integer [ref: > users.user_id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table batch_participants {
+  batch_id integer [ref: > batches.batch_id]
+  user_id integer [ref: > users.user_id]
+  enrolled_at timestamp [default: `now()`]
+  enrolled_by integer [ref: > users.user_id]
+  status participant_status [default: 'ACTIVE']
+
+  indexes {
+    (batch_id, user_id) [pk]
+  }
+}
+
+Table assessment_tools {
+  tool_id integer [primary key]
+  tool_name varchar(100) [not null]
+  description text
+  algorithm_version varchar(20)
+  question_count integer
+  time_limit_minutes integer
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table assessment_packages {
+  package_id integer [primary key]
+  company_id integer [ref: > companies.company_id]
+  package_name varchar(100)
+  tool_id integer [ref: > assessment_tools.tool_id]
+  total_assessments integer [not null]
+  used_assessments integer [default: 0]
+  remaining_assessments integer
+  purchase_date date
+  expiry_date date
+  package_type package_type
+  purchased_by integer [ref: > users.user_id]
+  created_at timestamp [default: `now()`]
+}
+
+Table interview_candidates {
+  candidate_id integer [primary key]
+  company_id integer [ref: > companies.company_id]
+  package_id integer [ref: > assessment_packages.package_id]
+  name varchar(100) [not null]
+  email varchar(100)
+  phone varchar(20)
+  position_applied varchar(100)
+  assessment_link varchar(500)
+  status candidate_status [default: 'PENDING']
+  converted_to_user_id integer [ref: > users.user_id]
+  assigned_by integer [ref: > users.user_id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table assessments {
+  assessment_id integer [primary key]
+  user_id integer [ref: > users.user_id]
+  candidate_id integer [ref: > interview_candidates.candidate_id]
+  tool_id integer [ref: > assessment_tools.tool_id]
+  batch_id integer [ref: > batches.batch_id]
+  assessment_result json
+  final_result json
+  freeze_period_end timestamp
+  is_result_locked boolean [default: false]
+  completed_at timestamp
+  last_edited_by integer [ref: > users.user_id]
+  last_edited_at timestamp
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table assignments {
+  assignment_id integer [primary key]
+  tool_id integer [ref: > assessment_tools.tool_id]
+  assignment_name varchar(200) [not null]
+  description text
+  instructions text
+  submission_format submission_format
+  max_file_size_mb integer [default: 10]
+  due_date_offset_days integer [default: 7]
+  is_mandatory boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table assignment_submissions {
+  submission_id integer [primary key]
+  assignment_id integer [ref: > assignments.assignment_id]
+  user_id integer [ref: > users.user_id]
+  batch_id integer [ref: > batches.batch_id]
+  submission_file_path varchar(500)
+  submission_text text
+  submitted_at timestamp [default: `now()`]
+  graded_by integer [ref: > users.user_id]
+  grade varchar(10)
+  feedback text
+  graded_at timestamp
+}
+
+Table resources {
+  resource_id integer [primary key]
+  tool_id integer [ref: > assessment_tools.tool_id]
+  resource_name varchar(200) [not null]
+  description text
+  file_path varchar(500)
+  file_type resource_file_type
+  file_size_mb decimal(10,2)
+  access_level access_level
+  is_downloadable boolean [default: false]
+  watermark_required boolean [default: true]
+  created_by integer [ref: > users.user_id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table batch_resource_access {
+  batch_id integer [ref: > batches.batch_id]
+  resource_id integer [ref: > resources.resource_id]
+  unlocked_by integer [ref: > users.user_id]
+  unlocked_at timestamp [default: `now()`]
+  access_expires_at timestamp
+
+  indexes {
+    (batch_id, resource_id) [pk]
+  }
+}
+
+Table quizzes {
+  quiz_id integer [primary key]
+  quiz_name varchar(200) [not null]
+  description text
+  question_count integer
+  time_limit_minutes integer
+  is_active boolean [default: true]
+  created_by integer [ref: > users.user_id]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table quiz_sessions {
+  session_id integer [primary key]
+  quiz_id integer [ref: > quizzes.quiz_id]
+  session_name varchar(200)
+  access_code varchar(20)
+  qr_code_path varchar(500)
+  started_by integer [ref: > users.user_id]
+  started_at timestamp [default: `now()`]
+  ended_at timestamp
+  status quiz_session_status [default: 'ACTIVE']
+}
+
+Table quiz_responses {
+  response_id integer [primary key]
+  session_id integer [ref: > quiz_sessions.session_id]
+  participant_name varchar(100)
+  participant_email varchar(100)
+  responses json
+  score integer
+  completed_at timestamp [default: `now()`]
+  rank integer
+}
+
+Table system_settings {
+  setting_id integer [primary key]
+  setting_key varchar(100) [unique, not null]
+  setting_value text
+  description text
+  data_type system_setting_data_type
+  updated_by integer [ref: > users.user_id]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (setting_key) [unique]
+  }
+}
