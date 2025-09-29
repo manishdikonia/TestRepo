@@ -1,0 +1,73 @@
+graph TB
+    %% Main Entry Points
+    subgraph "Authentication Layer"
+        A[Permissions] --> B[Permission Table<br/>permission_id FK<br/>permission_name]
+        B --> C[Role Permissions<br/>role_id FK<br/>permission_id FK]
+        D[Roles] --> E[Role Table<br/>role_id<br/>role_name<br/>role_id]
+        E --> C
+    end
+
+    %% Organization Structure
+    subgraph "Organization Management"
+        F[Organization] --> G[Assigned Role]
+        G --> H[Company<br/>company_id PK<br/>company_name<br/>created_at]
+        H --> I[User Company<br/>user_id FK<br/>company_id FK<br/>role_id FK<br/>assigned_by FK<br/>created_at]
+    end
+
+    %% User Management
+    subgraph "User Management"
+        J[Users] --> K[User Table<br/>user_id PK<br/>email<br/>created_by FK]
+        K --> I
+        K --> L[Created By]
+    end
+
+    %% Learning & Assessment Module
+    subgraph "Learning & Assessments"
+        M[Batch] --> N[Batch Table<br/>batch_id<br/>company_id FK<br/>batch_name<br/>created_by FK]
+        N --> O[Batch Participants<br/>batch_id FK<br/>user_id FK<br/>enrolled_by FK]
+        
+        P[Assignments] --> Q[Assignment Table<br/>assignment_id PK<br/>tool_id FK]
+        Q --> R[Assignment Submissions<br/>submission_id PK<br/>assignment_id FK<br/>user_id FK<br/>batch_id FK<br/>graded_by FK]
+        
+        S[Assessments] --> T[Assessment Table<br/>assessment_id PK<br/>user_id FK<br/>tool_id FK<br/>batch_id FK<br/>test_edited_by FK]
+    end
+
+    %% Content & Access Control
+    subgraph "Content & Access"
+        U[Resources] --> V[Resource Table<br/>resource_id PK<br/>tool_id FK<br/>created_by FK]
+        V --> W[Resource Access<br/>batch_id FK<br/>resource_id FK<br/>unlocked_by FK]
+        
+        X[Assessment Packages] --> Y[Package Table<br/>package_id PK<br/>company_id FK<br/>tool_id FK<br/>package_name<br/>created_by FK]
+        
+        Z[Interview Candidates] --> AA[Candidate Table<br/>candidate_id PK<br/>company_id FK<br/>package_id FK<br/>candidate_email<br/>assigned_by FK]
+    end
+
+    %% Quiz System
+    subgraph "Quiz System"
+        AB[Quizzes] --> AC[Quiz Table<br/>quiz_id PK<br/>created_by FK]
+        AC --> AD[Quiz Sessions<br/>session_id<br/>quiz_id FK<br/>started_by FK]
+        AD --> AE[Quiz Responses<br/>response_id PK<br/>session_id FK]
+    end
+
+    %% System Configuration
+    subgraph "System Settings"
+        AF[System Settings] --> AG[Setting Table<br/>setting_key Unique<br/>setting_value]
+    end
+
+    %% Relationships (simplified connections)
+    C -.-> K
+    I -.-> N
+    I -.-> O
+    O -.-> R
+    O -.-> T
+    W -.-> O
+    Y -.-> AA
+
+    %% Styling
+    classDef primaryTable fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef secondaryTable fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef relationTable fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    
+    class B,E,K,H primaryTable
+    class N,Q,T,V,Y,AC secondaryTable
+    class C,I,O,R,W,AA,AD relationTable

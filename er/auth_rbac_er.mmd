@@ -1,0 +1,158 @@
+erDiagram
+    %% Core Authentication Entities
+    PERMISSIONS {
+        int permission_id PK
+        string permission_name
+    }
+    
+    ROLES {
+        int role_id PK
+        string role_name
+    }
+    
+    ROLE_PERMISSIONS {
+        int role_id FK
+        int permission_id FK
+    }
+    
+    %% User and Organization
+    USERS {
+        int user_id PK
+        string email
+        int created_by FK
+        timestamp created_at
+    }
+    
+    COMPANIES {
+        int company_id PK
+        string company_name
+        timestamp created_at
+    }
+    
+    USER_COMPANY {
+        int user_id FK
+        int company_id FK
+        int role_id FK
+        int assigned_by FK
+        timestamp created_at
+    }
+    
+    %% Learning Management
+    BATCHES {
+        int batch_id PK
+        int company_id FK
+        string batch_name
+        int created_by FK
+    }
+    
+    BATCH_PARTICIPANTS {
+        int batch_id FK
+        int user_id FK
+        int enrolled_by FK
+    }
+    
+    %% Assessment Management
+    ASSIGNMENTS {
+        int assignment_id PK
+        int tool_id FK
+    }
+    
+    ASSIGNMENT_SUBMISSIONS {
+        int submission_id PK
+        int assignment_id FK
+        int user_id FK
+        int batch_id FK
+        int graded_by FK
+    }
+    
+    ASSESSMENTS {
+        int assessment_id PK
+        int user_id FK
+        int tool_id FK
+        int batch_id FK
+        int test_edited_by FK
+    }
+    
+    %% Content Management
+    RESOURCES {
+        int resource_id PK
+        int tool_id FK
+        int created_by FK
+    }
+    
+    RESOURCE_ACCESS {
+        int batch_id FK
+        int resource_id FK
+        int unlocked_by FK
+    }
+    
+    ASSESSMENT_PACKAGES {
+        int package_id PK
+        int company_id FK
+        int tool_id FK
+        string package_name
+        int created_by FK
+    }
+    
+    INTERVIEW_CANDIDATES {
+        int candidate_id PK
+        int company_id FK
+        int package_id FK
+        string candidate_email
+        int assigned_by FK
+    }
+    
+    %% Quiz System
+    QUIZZES {
+        int quiz_id PK
+        int created_by FK
+    }
+    
+    QUIZ_SESSIONS {
+        int session_id PK
+        int quiz_id FK
+        int started_by FK
+    }
+    
+    QUIZ_RESPONSES {
+        int response_id PK
+        int session_id FK
+    }
+    
+    %% System Configuration
+    SYSTEM_SETTINGS {
+        string setting_key UK
+        string setting_value
+    }
+    
+    %% Relationships
+    PERMISSIONS ||--o{ ROLE_PERMISSIONS : has
+    ROLES ||--o{ ROLE_PERMISSIONS : contains
+    ROLES ||--o{ USER_COMPANY : assigned_to
+    
+    USERS ||--o{ USER_COMPANY : belongs_to
+    USERS ||--o{ USERS : created_by
+    USERS ||--o{ BATCH_PARTICIPANTS : enrolled_in
+    USERS ||--o{ ASSIGNMENT_SUBMISSIONS : submitted
+    USERS ||--o{ ASSESSMENTS : takes
+    USERS ||--o{ QUIZZES : creates
+    USERS ||--o{ QUIZ_SESSIONS : starts
+    
+    COMPANIES ||--o{ USER_COMPANY : employs
+    COMPANIES ||--o{ BATCHES : has
+    COMPANIES ||--o{ ASSESSMENT_PACKAGES : owns
+    COMPANIES ||--o{ INTERVIEW_CANDIDATES : interviews
+    
+    BATCHES ||--o{ BATCH_PARTICIPANTS : contains
+    BATCHES ||--o{ ASSIGNMENT_SUBMISSIONS : for_batch
+    BATCHES ||--o{ ASSESSMENTS : batch_assessment
+    BATCHES ||--o{ RESOURCE_ACCESS : batch_resources
+    
+    ASSIGNMENTS ||--o{ ASSIGNMENT_SUBMISSIONS : has_submissions
+    
+    RESOURCES ||--o{ RESOURCE_ACCESS : accessed_by
+    
+    ASSESSMENT_PACKAGES ||--o{ INTERVIEW_CANDIDATES : assigned_to
+    
+    QUIZZES ||--o{ QUIZ_SESSIONS : has_sessions
+    QUIZ_SESSIONS ||--o{ QUIZ_RESPONSES : has_responses

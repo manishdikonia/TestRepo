@@ -1,0 +1,104 @@
+flowchart TB
+    %% Define Styles
+    classDef authClass fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000
+    classDef orgClass fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000
+    classDef userClass fill:#ffe0b2,stroke:#e65100,stroke-width:2px,color:#000
+    classDef contentClass fill:#f8bbd0,stroke:#c2185b,stroke-width:2px,color:#000
+    classDef assessClass fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px,color:#000
+    classDef quizClass fill:#ffccbc,stroke:#bf360c,stroke-width:2px,color:#000
+    classDef settingClass fill:#d7ccc8,stroke:#4e342e,stroke-width:2px,color:#000
+
+    %% Authentication & RBAC Core
+    subgraph AUTH["🔐 Authentication & RBAC"]
+        direction TB
+        PERM[["📋 Permissions<br/>• permission_id (PK)<br/>• permission_name"]]
+        ROLE[["👥 Roles<br/>• role_id (PK)<br/>• role_name"]]
+        ROLE_PERM[["🔗 Role_Permissions<br/>• role_id (FK)<br/>• permission_id (FK)"]]
+        
+        PERM --> ROLE_PERM
+        ROLE --> ROLE_PERM
+    end
+
+    %% Organization Structure
+    subgraph ORG["🏢 Organization"]
+        direction TB
+        COMPANY[["🏭 Companies<br/>• company_id (PK)<br/>• company_name<br/>• created_at"]]
+        USER_COMP[["👤 User_Company<br/>• user_id (FK)<br/>• company_id (FK)<br/>• role_id (FK)<br/>• assigned_by (FK)"]]
+        
+        COMPANY --> USER_COMP
+    end
+
+    %% User Management
+    subgraph USERS["👤 User Management"]
+        direction TB
+        USER[["👤 Users<br/>• user_id (PK)<br/>• email<br/>• created_by (FK)"]]
+    end
+
+    %% Learning Platform
+    subgraph LEARN["📚 Learning Platform"]
+        direction TB
+        BATCH[["📦 Batches<br/>• batch_id (PK)<br/>• company_id (FK)<br/>• batch_name<br/>• created_by (FK)"]]
+        BATCH_PART[["👥 Batch_Participants<br/>• batch_id (FK)<br/>• user_id (FK)<br/>• enrolled_by (FK)"]]
+        
+        BATCH --> BATCH_PART
+    end
+
+    %% Assessment System
+    subgraph ASSESS["📝 Assessment System"]
+        direction TB
+        ASSIGNMENT[["📄 Assignments<br/>• assignment_id (PK)<br/>• tool_id (FK)"]]
+        SUBMISSION[["📤 Submissions<br/>• submission_id (PK)<br/>• assignment_id (FK)<br/>• user_id (FK)<br/>• batch_id (FK)<br/>• graded_by (FK)"]]
+        ASSESSMENT[["✅ Assessments<br/>• assessment_id (PK)<br/>• user_id (FK)<br/>• tool_id (FK)<br/>• batch_id (FK)<br/>• test_edited_by (FK)"]]
+        
+        ASSIGNMENT --> SUBMISSION
+    end
+
+    %% Content Management
+    subgraph CONTENT["📂 Content & Resources"]
+        direction TB
+        RESOURCE[["📚 Resources<br/>• resource_id (PK)<br/>• tool_id (FK)<br/>• created_by (FK)"]]
+        RES_ACCESS[["🔓 Resource_Access<br/>• batch_id (FK)<br/>• resource_id (FK)<br/>• unlocked_by (FK)"]]
+        PACKAGE[["📦 Assessment_Packages<br/>• package_id (PK)<br/>• company_id (FK)<br/>• tool_id (FK)<br/>• package_name"]]
+        CANDIDATE[["👨‍💼 Interview_Candidates<br/>• candidate_id (PK)<br/>• company_id (FK)<br/>• package_id (FK)<br/>• candidate_email<br/>• assigned_by (FK)"]]
+        
+        RESOURCE --> RES_ACCESS
+        PACKAGE --> CANDIDATE
+    end
+
+    %% Quiz Module
+    subgraph QUIZ["❓ Quiz System"]
+        direction TB
+        QUIZ_T[["📝 Quizzes<br/>• quiz_id (PK)<br/>• created_by (FK)"]]
+        QUIZ_SESS[["⏱️ Quiz_Sessions<br/>• session_id (PK)<br/>• quiz_id (FK)<br/>• started_by (FK)"]]
+        QUIZ_RESP[["✍️ Quiz_Responses<br/>• response_id (PK)<br/>• session_id (FK)"]]
+        
+        QUIZ_T --> QUIZ_SESS
+        QUIZ_SESS --> QUIZ_RESP
+    end
+
+    %% System Configuration
+    subgraph CONFIG["⚙️ System Configuration"]
+        SETTINGS[["🔧 System_Settings<br/>• setting_key (UNIQUE)<br/>• setting_value"]]
+    end
+
+    %% Main Relationships
+    ROLE_PERM -.->|assigns roles| USER_COMP
+    USER -->|belongs to| USER_COMP
+    USER_COMP -->|organizes| BATCH
+    USER -->|participates| BATCH_PART
+    BATCH_PART -->|submits| SUBMISSION
+    BATCH_PART -->|takes| ASSESSMENT
+    BATCH_PART -->|accesses| RES_ACCESS
+    COMPANY -->|creates| PACKAGE
+    USER -->|creates| QUIZ_T
+    USER -->|starts| QUIZ_SESS
+
+    %% Apply Styles
+    class PERM,ROLE,ROLE_PERM authClass
+    class COMPANY,USER_COMP orgClass
+    class USER userClass
+    class BATCH,BATCH_PART contentClass
+    class ASSIGNMENT,SUBMISSION,ASSESSMENT assessClass
+    class RESOURCE,RES_ACCESS,PACKAGE,CANDIDATE contentClass
+    class QUIZ_T,QUIZ_SESS,QUIZ_RESP quizClass
+    class SETTINGS settingClass
