@@ -1,0 +1,134 @@
+erDiagram
+  %% Learning & Assessment Module
+  
+  companies {
+    int company_id PK
+    varchar company_name
+    enum subscription_status
+  }
+
+  users {
+    int user_id PK
+    int company_id FK
+    varchar name
+    varchar email
+    enum company_role
+    boolean is_active
+  }
+
+  batches {
+    int batch_id PK
+    int company_id FK
+    varchar batch_name
+    int coach_id FK
+    int max_participants
+    int current_participants
+    date start_date
+    date end_date
+    enum status
+    int created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  batch_participants {
+    int batch_id FK
+    int user_id FK
+    timestamp enrolled_at
+    int enrolled_by FK
+    enum status
+  }
+
+  assessment_tools {
+    int tool_id PK
+    varchar tool_name
+    text description
+    varchar algorithm_version
+    int question_count
+    int time_limit_minutes
+    boolean is_active
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  assessment_packages {
+    int package_id PK
+    int company_id FK
+    varchar package_name
+    int tool_id FK
+    int total_assessments
+    int used_assessments
+    int remaining_assessments
+    date purchase_date
+    date expiry_date
+    enum package_type
+    int purchased_by FK
+    timestamp created_at
+  }
+
+  assessments {
+    int assessment_id PK
+    int user_id FK
+    int candidate_id FK
+    int tool_id FK
+    int batch_id FK
+    json assessment_result
+    json final_result
+    timestamp freeze_period_end
+    boolean is_result_locked
+    timestamp completed_at
+    int last_edited_by FK
+    timestamp last_edited_at
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  assignments {
+    int assignment_id PK
+    int tool_id FK
+    varchar assignment_name
+    text description
+    text instructions
+    enum submission_format
+    int max_file_size_mb
+    int due_date_offset_days
+    boolean is_mandatory
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  assignment_submissions {
+    int submission_id PK
+    int assignment_id FK
+    int user_id FK
+    int batch_id FK
+    varchar submission_file_path
+    text submission_text
+    timestamp submitted_at
+    int graded_by FK
+    varchar grade
+    text feedback
+    timestamp graded_at
+  }
+
+  %% Relationships
+  companies ||--o{ batches : "creates"
+  users ||--o{ batches : "coaches"
+  users ||--o{ batches : "creates"
+  batches ||--o{ batch_participants : "contains"
+  users ||--o{ batch_participants : "enrolled"
+  
+  assessment_tools ||--o{ assessment_packages : "packaged"
+  companies ||--o{ assessment_packages : "purchases"
+  users ||--o{ assessment_packages : "purchased_by"
+  
+  assessment_tools ||--o{ assessments : "uses"
+  users ||--o{ assessments : "takes"
+  batches ||--o{ assessments : "includes"
+  users ||--o{ assessments : "edited_by"
+  
+  assessment_tools ||--o{ assignments : "includes"
+  assignments ||--o{ assignment_submissions : "receives"
+  users ||--o{ assignment_submissions : "submits"
+  batches ||--o{ assignment_submissions : "context"
+  users ||--o{ assignment_submissions : "grades"

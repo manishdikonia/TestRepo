@@ -1,0 +1,163 @@
+erDiagram
+  %% High-Level System Overview - All Tables with Key Relationships
+  
+  %% Core entities (simplified view)
+  roles ||--o{ users : "has_role"
+  companies ||--o{ users : "employs"
+  companies ||--o{ batches : "creates"
+  users ||--o{ batches : "coaches"
+  batches ||--o{ batch_participants : "contains"
+  users ||--o{ batch_participants : "enrolled_in"
+  
+  %% Assessment system
+  assessment_tools ||--o{ assessment_packages : "packaged_as"
+  companies ||--o{ assessment_packages : "purchases"
+  assessment_tools ||--o{ assessments : "evaluated_with"
+  users ||--o{ assessments : "takes"
+  batches ||--o{ assessments : "includes"
+  
+  %% Assignments
+  assessment_tools ||--o{ assignments : "includes"
+  assignments ||--o{ assignment_submissions : "receives"
+  users ||--o{ assignment_submissions : "submits"
+  
+  %% Resources & Access
+  assessment_tools ||--o{ resources : "provides"
+  batches ||--o{ batch_resource_access : "unlocks"
+  resources ||--o{ batch_resource_access : "accessed_via"
+  
+  %% Interview candidates
+  companies ||--o{ interview_candidates : "interviews"
+  assessment_packages ||--o{ interview_candidates : "evaluates"
+  interview_candidates ||--o{ assessments : "takes"
+  
+  %% Quiz system
+  users ||--o{ quizzes : "creates"
+  quizzes ||--o{ quiz_sessions : "runs_as"
+  quiz_sessions ||--o{ quiz_responses : "collects"
+  
+  %% Permissions
+  permissions ||--o{ role_permissions : "granted_via"
+  roles ||--o{ role_permissions : "has_permission"
+  
+  %% Company coaches
+  companies ||--o{ company_coaches : "has_coaches"
+  users ||--o{ company_coaches : "coaches_for"
+  
+  %% System settings
+  users ||--o{ system_settings : "configures"
+
+  %% Table definitions (minimal for overview)
+  roles {
+    int role_id PK
+    varchar role_name
+  }
+  
+  permissions {
+    int permission_id PK
+    varchar permission_name
+  }
+  
+  role_permissions {
+    int role_id FK
+    int permission_id FK
+  }
+  
+  companies {
+    int company_id PK
+    varchar company_name
+    enum subscription_status
+  }
+  
+  users {
+    int user_id PK
+    int company_id FK
+    int role_id FK
+    varchar name
+    varchar email
+  }
+  
+  company_coaches {
+    int company_id FK
+    int coach_id FK
+  }
+  
+  batches {
+    int batch_id PK
+    int company_id FK
+    varchar batch_name
+    int coach_id FK
+  }
+  
+  batch_participants {
+    int batch_id FK
+    int user_id FK
+  }
+  
+  assessment_tools {
+    int tool_id PK
+    varchar tool_name
+  }
+  
+  assessment_packages {
+    int package_id PK
+    int company_id FK
+    int tool_id FK
+  }
+  
+  assessments {
+    int assessment_id PK
+    int user_id FK
+    int tool_id FK
+    int batch_id FK
+  }
+  
+  assignments {
+    int assignment_id PK
+    int tool_id FK
+    varchar assignment_name
+  }
+  
+  assignment_submissions {
+    int submission_id PK
+    int assignment_id FK
+    int user_id FK
+  }
+  
+  resources {
+    int resource_id PK
+    int tool_id FK
+    varchar resource_name
+  }
+  
+  batch_resource_access {
+    int batch_id FK
+    int resource_id FK
+  }
+  
+  interview_candidates {
+    int candidate_id PK
+    int company_id FK
+    int package_id FK
+    varchar name
+  }
+  
+  quizzes {
+    int quiz_id PK
+    varchar quiz_name
+  }
+  
+  quiz_sessions {
+    int session_id PK
+    int quiz_id FK
+  }
+  
+  quiz_responses {
+    int response_id PK
+    int session_id FK
+  }
+  
+  system_settings {
+    int setting_id PK
+    varchar setting_key
+  }

@@ -1,0 +1,66 @@
+erDiagram
+  %% Authentication & RBAC Module
+  
+  roles {
+    int role_id PK
+    varchar role_name
+    text description
+    boolean is_system_role
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  permissions {
+    int permission_id PK
+    varchar permission_name
+    text description
+    varchar resource
+    varchar action
+    timestamp created_at
+  }
+
+  role_permissions {
+    int role_id FK
+    int permission_id FK
+    timestamp assigned_at
+  }
+
+  users {
+    int user_id PK
+    int company_id FK
+    int role_id FK
+    varchar name
+    varchar email
+    varchar password_hash
+    varchar phone
+    varchar designation
+    enum company_role
+    boolean is_active
+    timestamp last_login
+    int created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  companies {
+    int company_id PK
+    varchar company_name
+    varchar contact_person
+    varchar contact_email
+    varchar contact_phone
+    text address
+    date contract_start_date
+    date contract_end_date
+    int max_batch_size
+    int max_employees
+    enum subscription_status
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  %% Relationships
+  roles ||--o{ role_permissions : "has"
+  permissions ||--o{ role_permissions : "granted_to"
+  roles ||--o{ users : "assigned_to"
+  companies ||--o{ users : "employs"
+  users ||--o{ users : "created_by"

@@ -1,0 +1,141 @@
+erDiagram
+  %% Content, Resources & Quiz Module
+  
+  users {
+    int user_id PK
+    varchar name
+    varchar email
+    enum company_role
+  }
+
+  batches {
+    int batch_id PK
+    varchar batch_name
+    enum status
+  }
+
+  assessment_tools {
+    int tool_id PK
+    varchar tool_name
+    text description
+    boolean is_active
+  }
+
+  resources {
+    int resource_id PK
+    int tool_id FK
+    varchar resource_name
+    text description
+    varchar file_path
+    enum file_type
+    decimal file_size_mb
+    enum access_level
+    boolean is_downloadable
+    boolean watermark_required
+    int created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  batch_resource_access {
+    int batch_id FK
+    int resource_id FK
+    int unlocked_by FK
+    timestamp unlocked_at
+    timestamp access_expires_at
+  }
+
+  companies {
+    int company_id PK
+    varchar company_name
+  }
+
+  assessment_packages {
+    int package_id PK
+    int company_id FK
+    varchar package_name
+    enum package_type
+  }
+
+  interview_candidates {
+    int candidate_id PK
+    int company_id FK
+    int package_id FK
+    varchar name
+    varchar email
+    varchar phone
+    varchar position_applied
+    varchar assessment_link
+    enum status
+    int converted_to_user_id FK
+    int assigned_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  quizzes {
+    int quiz_id PK
+    varchar quiz_name
+    text description
+    int question_count
+    int time_limit_minutes
+    boolean is_active
+    int created_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  quiz_sessions {
+    int session_id PK
+    int quiz_id FK
+    varchar session_name
+    varchar access_code
+    varchar qr_code_path
+    int started_by FK
+    timestamp started_at
+    timestamp ended_at
+    enum status
+  }
+
+  quiz_responses {
+    int response_id PK
+    int session_id FK
+    varchar participant_name
+    varchar participant_email
+    json responses
+    int score
+    timestamp completed_at
+    int rank
+  }
+
+  system_settings {
+    int setting_id PK
+    varchar setting_key
+    text setting_value
+    text description
+    enum data_type
+    int updated_by FK
+    timestamp updated_at
+  }
+
+  %% Relationships - Resources
+  assessment_tools ||--o{ resources : "provides"
+  users ||--o{ resources : "uploads"
+  batches ||--o{ batch_resource_access : "unlocks"
+  resources ||--o{ batch_resource_access : "accessed"
+  users ||--o{ batch_resource_access : "unlocked_by"
+
+  %% Relationships - Candidates
+  companies ||--o{ interview_candidates : "interviews"
+  assessment_packages ||--o{ interview_candidates : "evaluates"
+  users ||--o{ interview_candidates : "assigns"
+  users ||--o{ interview_candidates : "converts_to"
+
+  %% Relationships - Quizzes
+  users ||--o{ quizzes : "creates"
+  quizzes ||--o{ quiz_sessions : "runs"
+  users ||--o{ quiz_sessions : "starts"
+  quiz_sessions ||--o{ quiz_responses : "collects"
+
+  %% Relationships - System
+  users ||--o{ system_settings : "updates"
