@@ -1,0 +1,50 @@
+{
+  "name": "postgres-source-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "4",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "postgres",
+    "database.dbname": "nestjs_db",
+    "database.server.name": "postgres-server",
+    "schema.include.list": "public",
+    "topic.prefix": "postgres",
+    
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+    
+    "transforms": "route,unwrap",
+    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.route.regex": "([^.]+)\\.([^.]+)\\.([^.]+)",
+    "transforms.route.replacement": "postgres-to-mysql.$3",
+    
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "false",
+    "transforms.unwrap.delete.handling.mode": "rewrite",
+    "transforms.unwrap.add.fields": "op,source.ts_ms,source.db,source.table,source.schema",
+    
+    "snapshot.mode": "initial",
+    "snapshot.select.statement.overrides": "",
+    "incremental.snapshot.chunk.size": "1024",
+    
+    "max.batch.size": "2048",
+    "max.queue.size": "8192",
+    "poll.interval.ms": "1000",
+    
+    "decimal.handling.mode": "string",
+    "time.precision.mode": "adaptive_time_microseconds",
+    "interval.handling.mode": "string",
+    
+    "skipped.operations": "none",
+    "tombstones.on.delete": "false",
+    
+    "slot.name": "debezium_slot",
+    "plugin.name": "pgoutput",
+    "publication.name": "dbz_publication",
+    "publication.autocreate.mode": "filtered"
+  }
+}

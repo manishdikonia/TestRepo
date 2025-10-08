@@ -1,0 +1,53 @@
+{
+  "name": "mysql-source-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+    "tasks.max": "4",
+    "database.hostname": "mysql",
+    "database.port": "3306",
+    "database.user": "mysql",
+    "database.password": "mysql",
+    "database.server.id": "184054",
+    "database.server.name": "mysql-server",
+    "database.include.list": "codeigniter_db",
+    "database.history.kafka.bootstrap.servers": "kafka:29092",
+    "database.history.kafka.topic": "mysql.history",
+    "include.schema.changes": "true",
+    "topic.prefix": "mysql",
+    
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+    
+    "transforms": "route,unwrap",
+    "transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.route.regex": "([^.]+)\\.([^.]+)\\.([^.]+)",
+    "transforms.route.replacement": "mysql-to-postgres.$3",
+    
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "false",
+    "transforms.unwrap.delete.handling.mode": "rewrite",
+    "transforms.unwrap.add.fields": "op,source.ts_ms,source.db,source.table",
+    
+    "snapshot.mode": "initial",
+    "snapshot.locking.mode": "minimal",
+    "snapshot.new.tables": "parallel",
+    "incremental.snapshot.chunk.size": "1024",
+    
+    "binlog.buffer.size": "32768",
+    "max.batch.size": "2048",
+    "max.queue.size": "8192",
+    "poll.interval.ms": "1000",
+    
+    "decimal.handling.mode": "string",
+    "bigint.unsigned.handling.mode": "long",
+    "time.precision.mode": "adaptive_time_microseconds",
+    
+    "skipped.operations": "none",
+    "tombstones.on.delete": "false",
+    
+    "database.connectionTimeZone": "UTC",
+    "enable.time.adjuster": "true"
+  }
+}

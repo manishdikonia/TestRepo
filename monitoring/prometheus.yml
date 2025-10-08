@@ -1,0 +1,46 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Kafka JMX metrics
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:9101']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Kafka Connect metrics
+  - job_name: 'kafka-connect'
+    static_configs:
+      - targets: ['kafka-connect:8083']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Custom sync health metrics
+  - job_name: 'sync-health'
+    static_configs:
+      - targets: ['sync-monitor:8084']
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+  # MySQL metrics (if using mysql_exporter)
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['mysql-exporter:9104']
+    scrape_interval: 30s
+
+  # PostgreSQL metrics (if using postgres_exporter)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 30s

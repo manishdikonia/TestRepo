@@ -1,0 +1,43 @@
+{
+  "name": "postgres-sink-connector",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "tasks.max": "4",
+    "connection.url": "jdbc:postgresql://postgres:5432/nestjs_db",
+    "connection.user": "postgres",
+    "connection.password": "postgres",
+    "topics.regex": "mysql-to-postgres\\.(.*)",
+    
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+    
+    "transforms": "addPrefix,extractKey,timestampConverter",
+    "transforms.addPrefix.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.addPrefix.regex": "mysql-to-postgres\\.(.*)",
+    "transforms.addPrefix.replacement": "mysql_$1",
+    
+    "transforms.extractKey.type": "org.apache.kafka.connect.transforms.ExtractField$Key",
+    "transforms.extractKey.field": "id",
+    
+    "transforms.timestampConverter.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+    "transforms.timestampConverter.field": "created_at",
+    "transforms.timestampConverter.target.type": "Timestamp",
+    "transforms.timestampConverter.format": "yyyy-MM-dd HH:mm:ss",
+    
+    "insert.mode": "upsert",
+    "pk.mode": "record_key",
+    "pk.fields": "id",
+    "auto.create": "true",
+    "auto.evolve": "true",
+    "delete.enabled": "true",
+    
+    "batch.size": "1000",
+    "max.retries": "10",
+    "retry.backoff.ms": "3000",
+    
+    "db.timezone": "UTC",
+    "quote.sql.identifiers": "always"
+  }
+}
