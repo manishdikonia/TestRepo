@@ -1,0 +1,101 @@
+groups:
+  - name: debezium_sync_alerts
+    rules:
+      # Connector health alerts
+      - alert: ConnectorDown
+        expr: kafka_connect_connector_status{state!="RUNNING"} == 1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Debezium connector {{ $labels.connector }} is down"
+          description: "Connector {{ $labels.connector }} has been in {{ $labels.state }} state for more than 2 minutes"
+
+      - alert: ConnectorTaskFailed
+        expr: kafka_connect_connector_task_status{state="FAILED"} == 1
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Debezium connector task failed"
+          description: "Task {{ $labels.task }} of connector {{ $labels.connector }} has failed"
+
+      # Kafka lag alerts
+      - alert: HighConsumerLag
+        expr: kafka_consumer_lag_sum > 10000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High consumer lag detected"
+          description: "Consumer group {{ $labels.consumergroup }} has lag of {{ $value }} messages"
+
+      # Sync delay alerts
+      - alert: SyncDelayHigh
+        expr: sync_delay_seconds > 300
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database sync delay is high"
+          description: "Sync delay between {{ $labels.source_db }} and {{ $labels.target_db }} is {{ $value }} seconds"
+
+      # Data inconsistency alerts
+      - alert: DataInconsistencyDetected
+        expr: data_inconsistency_count > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Data inconsistency detected"
+          description: "{{ $value }} data inconsistencies detected between databases"
+
+      # Conflict resolution alerts
+      - alert: ConflictResolutionFailure
+        expr: conflict_resolution_failures_total > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Multiple conflict resolution failures"
+          description: "{{ $value }} conflict resolution failures in the last 5 minutes"
+
+      # Database connection alerts
+      - alert: DatabaseConnectionLost
+        expr: database_connection_status == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection lost"
+          description: "Connection to {{ $labels.database }} has been lost"
+
+      # Kafka broker alerts
+      - alert: KafkaBrokerDown
+        expr: kafka_brokers_count < 1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kafka broker is down"
+          description: "Kafka broker has been down for more than 2 minutes"
+
+      # Disk space alerts
+      - alert: LowDiskSpace
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is below 10% on {{ $labels.instance }}"
+
+      # Memory usage alerts
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 90% on {{ $labels.instance }}"
