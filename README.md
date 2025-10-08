@@ -1,310 +1,205 @@
-### ER Diagram
+# Bidirectional Database Synchronization: MySQL ↔ PostgreSQL
 
-Below is the ER diagram rendered directly by GitHub using Mermaid. The source is in `er/diagram.mmd`. A generated image will also be available at `er/diagram.png`.
+This project implements real-time bidirectional synchronization between a MySQL database (legacy system) and a PostgreSQL database (new system) using Debezium and Apache Kafka.
 
-```mermaid
-erDiagram
-  roles {
-    int role_id PK
-    varchar role_name
-    text description
-    boolean is_system_role
-    timestamp created_at
-    timestamp updated_at
+## 🏗️ Architecture
+
+The solution uses:
+- **Apache Kafka** for event streaming
+- **Debezium** for Change Data Capture (CDC)
+- **NestJS** sync service for data transformation and conflict resolution
+- **Docker Compose** for easy deployment
+
+## 📋 Prerequisites
+
+- Docker and Docker Compose
+- Node.js 18+ (for local development)
+- At least 8GB RAM available
+- 10GB+ free disk space
+
+## 🚀 Quick Start
+
+1. **Clone and setup**
+   ```bash
+   git clone <repository>
+   cd <project-directory>
+   ```
+
+2. **Configure environment**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+3. **Start all services**
+   ```bash
+   ./scripts/start-services.sh
+   ```
+
+4. **Check sync status**
+   ```bash
+   ./scripts/check-sync-status.sh
+   ```
+
+## 📊 Service URLs
+
+- **Kafka UI**: http://localhost:8080
+- **Kafka Connect**: http://localhost:8083
+- **Sync Service**: http://localhost:3000
+- **Grafana** (if monitoring enabled): http://localhost:3001 (admin/admin)
+- **MySQL**: localhost:3306
+- **PostgreSQL**: localhost:5432
+
+## 🔧 Configuration
+
+### Table Mappings
+
+Edit `sync-service/src/sync/table-mapping.service.ts` to configure table mappings:
+
+```typescript
+{
+  source: {
+    database: 'legacy_db',
+    table: 'users',
+    columns: [
+      { source: 'id', target: 'id', type: 'int' },
+      { source: 'username', target: 'username', type: 'varchar' },
+      // ... more columns
+    ]
+  },
+  target: {
+    database: 'new_db',
+    table: 'users',
+    columns: []
   }
-
-  permissions {
-    int permission_id PK
-    varchar permission_name
-    text description
-    varchar resource
-    varchar action
-    timestamp created_at
-  }
-
-  role_permissions {
-    int role_id FK
-    int permission_id FK
-    timestamp assigned_at
-  }
-
-  companies {
-    int company_id PK
-    varchar company_name
-    varchar contact_person
-    varchar contact_email
-    varchar contact_phone
-    text address
-    date contract_start_date
-    date contract_end_date
-    int max_batch_size
-    int max_employees
-    enum subscription_status
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  users {
-    int user_id PK
-    int company_id FK
-    varchar name
-    varchar email
-    varchar password_hash
-    varchar phone
-    varchar designation
-    enum company_role
-    boolean is_active
-    timestamp last_login
-    int created_by FK
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  user_roles {
-    int user_id FK
-    int role_id FK
-    int company_id FK
-    int assigned_by FK
-    timestamp assigned_at
-    boolean is_active
-  }
-
-  company_coaches {
-    int company_id FK
-    int coach_id FK
-    timestamp assigned_at
-    int assigned_by FK
-    boolean is_active
-  }
-
-  batches {
-    int batch_id PK
-    int company_id FK
-    varchar batch_name
-    int coach_id FK
-    int max_participants
-    int current_participants
-    date start_date
-    date end_date
-    enum status
-    int created_by FK
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  batch_participants {
-    int batch_id FK
-    int user_id FK
-    timestamp enrolled_at
-    int enrolled_by FK
-    enum status
-  }
-
-  assessment_tools {
-    int tool_id PK
-    varchar tool_name
-    text description
-    varchar algorithm_version
-    int question_count
-    int time_limit_minutes
-    boolean is_active
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  assessment_packages {
-    int package_id PK
-    int company_id FK
-    varchar package_name
-    int tool_id FK
-    int total_assessments
-    int used_assessments
-    int remaining_assessments
-    date purchase_date
-    date expiry_date
-    enum package_type
-    int purchased_by FK
-    timestamp created_at
-  }
-
-  interview_candidates {
-    int candidate_id PK
-    int company_id FK
-    int package_id FK
-    varchar name
-    varchar email
-    varchar phone
-    varchar position_applied
-    varchar assessment_link
-    enum status
-    int converted_to_user_id FK
-    int assigned_by FK
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  assessments {
-    int assessment_id PK
-    int user_id FK
-    int candidate_id FK
-    int tool_id FK
-    int batch_id FK
-    json assessment_result
-    json final_result
-    timestamp freeze_period_end
-    boolean is_result_locked
-    timestamp completed_at
-    int last_edited_by FK
-    timestamp last_edited_at
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  assignments {
-    int assignment_id PK
-    int tool_id FK
-    varchar assignment_name
-    text description
-    text instructions
-    enum submission_format
-    int max_file_size_mb
-    int due_date_offset_days
-    boolean is_mandatory
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  assignment_submissions {
-    int submission_id PK
-    int assignment_id FK
-    int user_id FK
-    int batch_id FK
-    varchar submission_file_path
-    text submission_text
-    timestamp submitted_at
-    int graded_by FK
-    varchar grade
-    text feedback
-    timestamp graded_at
-  }
-
-  resources {
-    int resource_id PK
-    int tool_id FK
-    varchar resource_name
-    text description
-    varchar file_path
-    enum file_type
-    decimal file_size_mb
-    enum access_level
-    boolean is_downloadable
-    boolean watermark_required
-    int created_by FK
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  batch_resource_access {
-    int batch_id FK
-    int resource_id FK
-    int unlocked_by FK
-    timestamp unlocked_at
-    timestamp access_expires_at
-  }
-
-  quizzes {
-    int quiz_id PK
-    varchar quiz_name
-    text description
-    int question_count
-    int time_limit_minutes
-    boolean is_active
-    int created_by FK
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  quiz_sessions {
-    int session_id PK
-    int quiz_id FK
-    varchar session_name
-    varchar access_code
-    varchar qr_code_path
-    int started_by FK
-    timestamp started_at
-    timestamp ended_at
-    enum status
-  }
-
-  quiz_responses {
-    int response_id PK
-    int session_id FK
-    varchar participant_name
-    varchar participant_email
-    json responses
-    int score
-    timestamp completed_at
-    int rank
-  }
-
-  system_settings {
-    int setting_id PK
-    varchar setting_key
-    text setting_value
-    text description
-    enum data_type
-    int updated_by FK
-    timestamp updated_at
-  }
-
-  roles ||--o{ role_permissions : assigns
-  permissions ||--o{ role_permissions : grants
-
-  companies ||--o{ users : employs
-  users ||--o{ user_roles : has
-  roles ||--o{ user_roles : maps
-  companies ||--o{ user_roles : context
-
-  companies ||--o{ company_coaches : has
-  users ||--o{ company_coaches : coaches
-
-  companies ||--o{ batches : owns
-  users ||--o{ batches : coaches
-  users ||--o{ batches : creates
-
-  batches ||--o{ batch_participants : has
-  users ||--o{ batch_participants : enrolled
-
-  assessment_tools ||--o{ assessment_packages : uses
-  companies ||--o{ assessment_packages : purchases
-  users ||--o{ assessment_packages : purchases_by
-
-  assessment_packages ||--o{ interview_candidates : includes
-  companies ||--o{ interview_candidates : sources
-  users ||--o{ interview_candidates : assigns
-  users ||--o{ interview_candidates : converts
-
-  assessment_tools ||--o{ assessments : evaluated_with
-  users ||--o{ assessments : takes
-  interview_candidates ||--o{ assessments : candidate_of
-  batches ||--o{ assessments : in
-  users ||--o{ assessments : edited_by
-
-  assessment_tools ||--o{ assignments : includes
-  assignments ||--o{ assignment_submissions : has
-  users ||--o{ assignment_submissions : submits
-  batches ||--o{ assignment_submissions : context
-  users ||--o{ assignment_submissions : grades
-
-  assessment_tools ||--o{ resources : provides
-  users ||--o{ resources : uploads
-
-  batches ||--o{ batch_resource_access : unlocks
-  resources ||--o{ batch_resource_access : granted
-  users ||--o{ batch_resource_access : by
-
-  users ||--o{ quizzes : creates
-  quizzes ||--o{ quiz_sessions : has
-  users ||--o{ quiz_sessions : starts
-  quiz_sessions ||--o{ quiz_responses : records
+}
 ```
+
+### Conflict Resolution
+
+Configure conflict resolution strategy in `.env`:
+- `timestamp`: Latest timestamp wins
+- `version`: Higher version number wins
+- `custom`: Custom logic
+
+## 🏃 Running in Production
+
+### Performance Considerations
+
+1. **For 200+ tables**: 
+   - Use selective synchronization
+   - Configure appropriate Kafka partitions
+   - Increase connector tasks
+
+2. **For 50GB+ data**:
+   - Perform initial sync during off-peak hours
+   - Use batch processing for initial load
+   - Configure appropriate memory limits
+
+### Scaling
+
+```yaml
+# Increase Kafka Connect workers
+kafka-connect:
+  scale: 3
+  
+# Configure connector tasks
+"tasks.max": "10"
+```
+
+### Monitoring
+
+Enable monitoring for production:
+```bash
+cd monitoring
+docker-compose -f docker-compose.monitoring.yml up -d
+```
+
+## 🛠️ Development
+
+### Local Development
+
+```bash
+cd sync-service
+npm install
+npm run start:dev
+```
+
+### Testing
+
+```bash
+# Insert test data in MySQL
+docker exec -it mysql mysql -uroot -prootpassword legacy_db -e "
+INSERT INTO users (username, email, password_hash) 
+VALUES ('testuser', 'test@example.com', 'hash123');"
+
+# Check if data synced to PostgreSQL
+docker exec -it postgres psql -U postgres new_db -c "
+SELECT * FROM users WHERE username='testuser';"
+```
+
+## 🔍 Troubleshooting
+
+### Check Kafka Connect Status
+```bash
+curl http://localhost:8083/connectors/mysql-source-connector/status | jq .
+```
+
+### View Kafka Topics
+```bash
+docker exec kafka kafka-topics --list --bootstrap-server kafka:9092
+```
+
+### Check Consumer Lag
+```bash
+docker exec kafka kafka-consumer-groups --describe \
+  --group db-sync-service --bootstrap-server kafka:9092
+```
+
+### View Sync Service Logs
+```bash
+docker-compose logs -f sync-service
+```
+
+## 🚨 Common Issues
+
+1. **Loop Prevention**: Events are tagged with `sync_id` to prevent infinite loops
+2. **Schema Differences**: Configure proper data type mappings
+3. **Performance**: Adjust batch sizes and parallelism based on load
+4. **Conflicts**: Monitor conflict resolution logs
+
+## 📈 Performance Tuning
+
+### Kafka Configuration
+```properties
+# Increase for better throughput
+batch.size=32768
+linger.ms=10
+compression.type=snappy
+```
+
+### Debezium Configuration
+```json
+{
+  "snapshot.mode": "schema_only",
+  "snapshot.locking.mode": "none",
+  "binlog.buffer.size": "0",
+  "max.batch.size": "2048",
+  "max.queue.size": "8192"
+}
+```
+
+## 🔐 Security
+
+1. Use SSL/TLS for Kafka connections in production
+2. Implement proper authentication for all services
+3. Encrypt sensitive data in transit and at rest
+4. Use secrets management for credentials
+
+## 📝 License
+
+[Your License]
+
+## 🤝 Contributing
+
+[Contributing Guidelines]

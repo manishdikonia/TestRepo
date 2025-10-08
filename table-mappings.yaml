@@ -1,0 +1,146 @@
+# Table Mapping Configuration
+# This file defines how tables and columns map between MySQL and PostgreSQL
+
+mappings:
+  # Users table mapping
+  - source:
+      database: legacy_db
+      table: users
+    target:
+      database: new_db
+      table: users
+    columns:
+      - source: id
+        target: id
+        type: int
+      - source: username
+        target: username
+        type: varchar
+      - source: email
+        target: email
+        type: varchar
+      - source: password_hash
+        target: password_hash
+        type: varchar
+      - source: first_name
+        target: full_name
+        type: varchar
+        transform: concat_names
+      - source: last_name
+        target: full_name
+        type: varchar
+        transform: concat_names
+      - source: user_type
+        target: role
+        type: varchar
+        transform: map_user_type
+      - source: is_active
+        target: is_active
+        type: boolean
+      - source: created_date
+        target: created_at
+        type: timestamp
+      - source: modified_date
+        target: updated_at
+        type: timestamp
+    conflict_resolution:
+      strategy: timestamp
+      timestamp_column: updated_at
+    skip_columns:
+      - internal_notes
+      - legacy_field
+
+  # Products table mapping
+  - source:
+      database: legacy_db
+      table: products
+    target:
+      database: new_db
+      table: products
+    columns:
+      - source: product_id
+        target: id
+        type: int
+      - source: product_name
+        target: name
+        type: varchar
+      - source: product_desc
+        target: description
+        type: text
+      - source: price
+        target: price
+        type: decimal
+      - source: stock_qty
+        target: stock_quantity
+        type: int
+      - source: category_id
+        target: category_id
+        type: int
+      - source: product_status
+        target: status
+        type: varchar
+      - source: product_data
+        target: metadata
+        type: jsonb
+      - source: created_time
+        target: created_at
+        type: timestamp
+      - source: updated_time
+        target: updated_at
+        type: timestamp
+    conflict_resolution:
+      strategy: version
+      version_column: version
+
+  # Orders table mapping
+  - source:
+      database: legacy_db
+      table: orders
+    target:
+      database: new_db
+      table: orders
+    columns:
+      - source: order_id
+        target: id
+        type: int
+      - source: customer_id
+        target: user_id
+        type: int
+      - source: order_date
+        target: created_at
+        type: timestamp
+      - source: total_amount
+        target: total
+        type: decimal
+      - source: order_status
+        target: status
+        type: varchar
+      - source: shipping_addr
+        target: shipping_address
+        type: jsonb
+      - source: billing_addr
+        target: billing_address
+        type: jsonb
+    conflict_resolution:
+      strategy: timestamp
+      timestamp_column: created_at
+
+# Transform functions
+transforms:
+  concat_names:
+    type: function
+    description: Concatenate first and last name
+    
+  map_user_type:
+    type: mapping
+    mappings:
+      admin: administrator
+      customer: customer
+      vendor: seller
+      
+# Global settings
+settings:
+  enable_bidirectional: true
+  sync_deleted_records: true
+  batch_size: 1000
+  parallel_threads: 4
